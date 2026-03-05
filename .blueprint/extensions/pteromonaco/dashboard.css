@@ -1,0 +1,18 @@
+.FileEditContainer___StyledDiv3-sc-48rzpu-7, .FileEditContainer___StyledDiv4-sc-48rzpu-8 {
+    display: none !important;
+}
+
+#monaco-container {
+    height: calc(-20rem + 100vh);
+    min-height: 16rem;
+}
+
+.Button__ButtonStyle-sc-1qu1gou-0 {
+    flex: 1 1 0%;
+}
+
+@media (min-width: 640px) {
+    .Button__ButtonStyle-sc-1qu1gou-0 {
+        flex: none;
+    }
+}

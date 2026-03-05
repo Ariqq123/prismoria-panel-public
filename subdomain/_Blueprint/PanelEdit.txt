@@ -1,0 +1,45 @@
+/app/Services/Servers/ServerDeletionService.php
+Please insert this codes to /app/Services/Servers/ServerDeletionService.php under the use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException; line
+
+use Pterodactyl\Services\Servers\SubDomainDeletionService;
+
+
+Please insert this codes to /app/Services/Servers/ServerDeletionService.php under the private DaemonServerRepository $daemonServerRepository, line
+
+private SubDomainDeletionService $subDomainDeletionService,
+
+
+Please insert this codes to /app/Services/Servers/ServerDeletionService.php above the $server->delete(); line
+
+$this->subDomainDeletionService->delete($server->id, $server->egg_id);
+
+
+
+
+/app/Models/Permission.php
+Please insert this line to /app/Models/Permission.php above the 'websocket' => [ line
+
+'subdomain' => [
+	'description' => 'Manage Subdomain',
+	'keys' => [
+		'manage' => 'Create / Delete subdomain for current server.',
+	],
+],
+
+
+
+
+CloudFlare Setup:
+- CloudFlare Email: Your email for cloudflare profile
+- CloudFlare Api Key: Your Global Api Key for your cloudflare profile
+- Add your domain(s) to cloudflare
+
+!! CAUTION !!
+Don't forget to set IP alias to allocations in every node. IP Alias should be a domain which points to wings ip. Like node1.myhost.tld points to node1's ip. (A or CNAME record, DNS only)
+
+
+
+
+After you pasted files from PanelFiles to pterodactyl folder, run the following commands (in /var/www/pterodactyl/):
+- cd /var/www/pterodactyl/
+- blueprint -install subdomainmanager

@@ -1,0 +1,1 @@
+../../../.blueprint/extensions/votifiertester/routers/client.php

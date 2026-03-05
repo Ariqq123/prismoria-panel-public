@@ -1,0 +1,542 @@
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+rm: cannot remove '/var/www/pterodactyl/routes/blueprint/web/serverbackgrounds.php': No such file or directory
+ln: failed to create symbolic link '/var/www/pterodactyl/.blueprint/extensions/serverbackgrounds/private': File exists
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+
+   Predis\Connection\ConnectionException 
+
+   [tcp://localhost:6379]
+
+  at vendor/predis/predis/src/Connection/AbstractConnection.php:144
+    140▕      */
+    141▕     protected function onConnectionError($message, $code = 0)
+    142▕     {
+    143▕         CommunicationException::handle(
+  ➜ 144▕             new ConnectionException($this, "$message [{$this->getParameters()}]", $code)
+    145▕         );
+    146▕     }
+    147▕ 
+    148▕     /**
+
+      [2m+18 vendor frames [22m
+
+  19  app/Providers/AppServiceProvider.php:85
+      Illuminate\Support\Facades\Facade::__callStatic()
+
+  20  app/Providers/AppServiceProvider.php:29
+      Pterodactyl\Providers\AppServiceProvider::versionData()
+
+ln: failed to create symbolic link '/var/www/pterodactyl/.blueprint/extensions/pteromonaco/private': File exists
+
+   ERROR  The [public/storage] link already exists.  
+
+
+   INFO  Blade templates cached successfully.  
+
+
+   INFO  Configuration cached successfully.  
+
+
+   INFO  Route cache cleared successfully.  
+
+
+   INFO  Application cache cleared successfully.  
+
+Flushed Blueprint stylesheet and scripts cache.
+   INFO  Broadcasting queue restart signal.  
+
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/resources/views/blueprint/dashboard/wrappers/serverbackgrounds.blade.php': No such file or directory
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/routes/blueprint/web/serverbackgrounds.php': No such file or directory
+rm: cannot remove '/var/www/pterodactyl/routes/blueprint/client/subdomainmanager.php': No such file or directory
+rm: cannot remove '/var/www/pterodactyl/routes/blueprint/web/subdomainmanager.php': No such file or directory
+NAME: Subdomain
+PATH: /subdomain
+TYPE: server
+COMP: SubdomainContainer
+IDEN: SubdomainmanagerOsviovwkjt
+PERM: 
+ADMI: false
+ln: failed to create symbolic link '/var/www/pterodactyl/.blueprint/extensions/subdomainmanager/private': File exists
+
+   ERROR  The [public/storage] link already exists.  
+
+
+   INFO  Blade templates cached successfully.  
+
+
+   INFO  Configuration cached successfully.  
+
+
+   INFO  Route cache cleared successfully.  
+
+
+   INFO  Application cache cleared successfully.  
+
+Flushed Blueprint stylesheet and scripts cache.
+   INFO  Broadcasting queue restart signal.  
+
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/resources/views/blueprint/dashboard/wrappers/serverbackgrounds.blade.php': No such file or directory
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/routes/blueprint/web/serverbackgrounds.php': No such file or directory
+rm: cannot remove '/var/www/pterodactyl/routes/blueprint/client/votifiertester.php': No such file or directory
+NAME: Votifier
+PATH: /votifier
+TYPE: server
+COMP: VotiferTestContainer
+IDEN: VotifiertesterVakyfoihij
+PERM: 'file.read-content'
+ADMI: 
+ln: failed to create symbolic link '/var/www/pterodactyl/.blueprint/extensions/votifiertester/private': File exists
+
+   ERROR  The [public/storage] link already exists.  
+
+
+   INFO  Blade templates cached successfully.  
+
+
+   INFO  Configuration cached successfully.  
+
+
+   INFO  Route cache cleared successfully.  
+
+
+   INFO  Application cache cleared successfully.  
+
+Flushed Blueprint stylesheet and scripts cache.
+   INFO  Broadcasting queue restart signal.  
+
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/resources/views/blueprint/dashboard/wrappers/serverbackgrounds.blade.php': No such file or directory
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/routes/blueprint/web/serverbackgrounds.php': No such file or directory
+NAME: MC Logs
+PATH: /mclogs
+TYPE: server
+COMP: LogsPage
+IDEN: MclogsVkcpkfidyv
+PERM: 
+ADMI: false
+ln: failed to create symbolic link '/var/www/pterodactyl/.blueprint/extensions/mclogs/private': File exists
+
+   ERROR  The [public/storage] link already exists.  
+
+
+   INFO  Blade templates cached successfully.  
+
+
+   INFO  Configuration cached successfully.  
+
+
+   INFO  Route cache cleared successfully.  
+
+
+   INFO  Application cache cleared successfully.  
+
+Flushed Blueprint stylesheet and scripts cache.
+   INFO  Broadcasting queue restart signal.  
+
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/resources/views/blueprint/dashboard/wrappers/serverbackgrounds.blade.php': No such file or directory
+chown: cannot dereference '/var/www/pterodactyl/backups/custom-restore-prep-20260227-154352/current-files/routes/blueprint/web/serverbackgrounds.php': No such file or directory

@@ -1,0 +1,1 @@
+/* PteromonacoStart */ 'blueprint:pteromonaco' => [ 'driver' => 'local', 'root' => storage_path('extensions/pteromonaco'), 'url' => env('APP_URL') . '/fs/extensions/pteromonaco', 'visibility' => 'public', 'throw' => false, ], 'blueprint_private:pteromonaco' => [ 'driver' => 'local', 'root' => storage_path('.extensions/pteromonaco'), 'throw' => false, ], /* PteromonacoEnd */

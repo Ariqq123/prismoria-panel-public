@@ -1,0 +1,118 @@
+/routes/api-client.php
+Please paste this lines to /routes/api-client.php to above the Route::group(['prefix' => '/settings'], function () { line
+
+Route::group(['prefix' => '/subdomain'], function () {
+	Route::get('/', [Client\Servers\SubdomainController::class, 'index']);
+	Route::post('/create', [Client\Servers\SubdomainController::class, 'create']);
+	Route::delete('/delete/{id}', [Client\Servers\SubdomainController::class, 'delete']);
+});
+	
+	
+	
+	
+/routes/admin.php
+Please insert this codes to /routes/admin.php to the bottom of the file
+
+/*
+|--------------------------------------------------------------------------
+| SubDomain Controller Routes
+|--------------------------------------------------------------------------
+|
+| Endpoint: /admin/subdomain
+|
+*/
+Route::group(['prefix' => 'subdomain'], function () {
+    Route::get('/', [Admin\SubDomainController::class, 'index'])->name('admin.subdomain');
+    Route::get('/new', [Admin\SubDomainController::class, 'new'])->name('admin.subdomain.new');
+    Route::get('/edit/{id}', [Admin\SubDomainController::class, 'edit'])->name('admin.subdomain.edit');
+
+    Route::post('/settings', [Admin\SubDomainController::class, 'settings'])->name('admin.subdomain.settings');
+    Route::post('/create', [Admin\SubDomainController::class, 'create'])->name('admin.subdomain.create');
+    Route::post('/update/{id}', [Admin\SubDomainController::class, 'update'])->name('admin.subdomain.update');
+
+    Route::delete('/delete', [Admin\SubDomainController::class, 'delete'])->name('admin.subdomain.delete');
+});
+
+
+
+
+/resources/views/layouts/admin.blade.php
+Please insert this codes to /resources/views/layouts/admin.blade.php above the <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.nodes') ?: 'active' }}"> line
+
+<li class="{{ ! starts_with(Route::currentRouteName(), 'admin.subdomain') ?: 'active' }}">
+	<a href="{{ route('admin.subdomain') }}">
+		<i class="fa fa-globe"></i> <span>SubDomain Manager</span>
+	</a>
+</li>
+
+
+
+
+/app/Services/Servers/ServerDeletionService.php
+Please insert this codes to /app/Services/Servers/ServerDeletionService.php under the use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException; line
+
+use Pterodactyl\Services\Servers\SubDomainDeletionService;
+
+
+Please insert this codes to /app/Services/Servers/ServerDeletionService.php under the private DaemonServerRepository $daemonServerRepository, line
+
+private SubDomainDeletionService $subDomainDeletionService,
+
+
+Please insert this codes to /app/Services/Servers/ServerDeletionService.php above the $server->delete(); line
+
+$this->subDomainDeletionService->delete($server->id, $server->egg_id);
+
+
+
+
+/app/Models/Permission.php
+Please insert this line to /app/Models/Permission.php above the 'websocket' => [ line
+
+'subdomain' => [
+	'description' => 'Manage Subdomain',
+	'keys' => [
+		'manage' => 'Create / Delete subdomain for current server.',
+	],
+],
+
+
+
+
+/resources/scripts/routers/routes.ts
+Please paste this line to /resources/scripts/routers/routes.ts under the import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer'; line
+
+import SubdomainContainer from '@/components/server/subdomain/SubdomainContainer';
+
+
+Please paste this lines to /resources/scripts/routers/routes.ts to the bottom of servers array (help01.png)
+
+{
+	path: '/subdomain',
+	permission: 'subdomain.*',
+	name: 'Subdomain',
+	component: SubdomainContainer,
+},
+
+
+
+
+CloudFlare Setup:
+- CloudFlare Email: Your email for cloudflare profile
+- CloudFlare Api Key: Your Global Api Key for your cloudflare profile
+- Add your domain(s) to cloudflare
+
+!! CAUTION !!
+Don't forget to set IP alias to allocations in every node. IP Alias should be a domain which points to wings ip. Like node1.myhost.tld points to node1's ip. (A or CNAME record, DNS only)
+
+
+
+
+After all code inserted to code and app and resources and database folder pasted. Please run this commands (in /var/www/pterodactyl/):
+- composer require cloudflare/sdk:dev-master
+- yarn install
+- yarn run build:production
+- php artisan optimize
+- php artisan migrate
+
+# 58003SGUGB

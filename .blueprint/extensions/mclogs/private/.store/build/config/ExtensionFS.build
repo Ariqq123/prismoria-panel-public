@@ -1,0 +1,1 @@
+/* MclogsStart */ 'blueprint:mclogs' => [ 'driver' => 'local', 'root' => storage_path('extensions/mclogs'), 'url' => env('APP_URL') . '/fs/extensions/mclogs', 'visibility' => 'public', 'throw' => false, ], 'blueprint_private:mclogs' => [ 'driver' => 'local', 'root' => storage_path('.extensions/mclogs'), 'throw' => false, ], /* MclogsEnd */

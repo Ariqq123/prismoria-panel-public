@@ -1,0 +1,32 @@
+info:
+  name: "Votifier Tester"
+  identifier: "votifiertester"
+  description: "This form allows you to send test votes to a server using the Votifier plugin."
+  flags: ""
+  version: "1.0"
+  target: "beta-F248-1"
+  author: "Quantum Team"
+  icon: "VotifierIcon.png"
+  website: "https://www.sourcexchange.net/products/votifier-tester-for-pterodactyl"
+
+admin:
+  view: "view.blade.php"
+  controller: ""
+  css: ""
+  wrapper: ""
+
+dashboard:
+  css: ""
+  wrapper: ""
+  components: "components"
+
+data:
+  public: "public"
+
+requests:
+  views: ""
+  controllers: "controllers"
+  routers:
+    application: ""
+    client: "router/client.php"
+    web: ""

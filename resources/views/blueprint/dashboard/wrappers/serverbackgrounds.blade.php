@@ -1,0 +1,1 @@
+../../../../../.blueprint/extensions/serverbackgrounds/wrappers/dashboard.blade.php

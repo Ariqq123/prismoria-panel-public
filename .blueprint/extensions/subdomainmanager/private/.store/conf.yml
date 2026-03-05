@@ -1,0 +1,36 @@
+info:
+  name: "SubdomainManager"
+  identifier: "subdomainmanager"
+  description: "Manage subdomains with cloudflare SRV records."
+  flags: ""
+  version: "1.0"
+  target: "beta-A428-2"
+  author: "makkmarci13"
+  icon: ""
+  website: ""
+
+admin:
+  view: "views/index.blade.php"
+  controller: "controllers/SubdomainManagerAdminController.php"
+  css: ""
+  wrapper: ""
+
+dashboard:
+  css: ""
+  wrapper: ""
+  components: "components"
+
+data:
+  directory: ""
+  public: ""
+
+requests:
+  views: "views"
+  controllers: "controllers"
+  routers:
+    application: ""
+    client: "routes/api-client.php"
+    web: "routes/web.php"
+
+database:
+  migrations: "migrations"

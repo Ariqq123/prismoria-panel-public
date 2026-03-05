@@ -1,0 +1,41 @@
+## Blueprint addon manifest for MC Logs.
+## `identifier` should be treated as immutable after release (it is used for install/remove and lookups).
+## `target` should match the Blueprint release this addon is tested against.
+
+info:
+  name: "MC Logs"
+  identifier: "mclogs"
+  description: "Addon that allows users to Utilise the MCLOGS API"
+  flags: ""
+  version: "1.6"
+  target: "beta-2026-01"
+  author: "Euphoria Development"
+  icon: "mclogs_icon.jpg"
+  website: "https://euphoriadevelopment.uk"
+
+admin:
+  view: "admin/view.blade.php"
+  controller: ""
+  css: ""
+  wrapper: ""
+
+dashboard:
+  css: ""
+  wrapper: "client/wrapper.blade.php"
+  components: "components"
+
+data:
+  directory: ""
+  public: "public"
+  console: ""
+
+requests:
+  views: ""
+  controllers: ""
+  routers:
+    application: ""
+    client: ""
+    web: ""
+
+database:
+  migrations: ""

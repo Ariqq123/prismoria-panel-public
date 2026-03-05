@@ -1,0 +1,37 @@
+info:
+  name: "Pterodactyl Region"
+  identifier: "pterodactylregion"
+  description: "Server region lookup integration."
+  flags: "show_in_sidebar"
+  version: "local"
+  target: "beta-2026-01"
+  author: "Xentra Network"
+  icon: "icon.jpg"
+  website: ""
+
+admin:
+  view: ""
+  controller: ""
+  css: ""
+  wrapper: ""
+
+dashboard:
+  css: ""
+  wrapper: ""
+  components: ""
+
+data:
+  directory: ""
+  public: ""
+  console: ""
+
+requests:
+  views: ""
+  controllers: ""
+  routers:
+    application: ""
+    client: ""
+    web: ""
+
+database:
+  migrations: ""

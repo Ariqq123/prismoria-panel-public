@@ -1,0 +1,86 @@
+## Blueprint component slot map.
+## Values are component names (TSX files in `components/` without extension) or route injection entries.
+## This addon adds a server route at `/mclogs` that renders `LogsPage`.
+
+Navigation:
+  NavigationBar: 
+    BeforeNavigation: ""
+    AdditionalItems: ""
+    AfterNavigation: ""
+  SubNavigation:
+    BeforeSubNavigation: ""
+    AdditionalServerItems: ""
+    AdditionalAccountItems: ""
+    AfterSubNavigation: ""
+  Routes:
+    - { Name: "MC Logs", Path: "/mclogs", Type: "server", Component: "LogsPage", AdminOnly: "false" }
+
+Dashboard:
+  BeforeContent: ""
+  AfterContent: ""
+  ServerRow:
+    BeforeEntryName: ""
+    AfterEntryName: ""
+    BeforeEntryDescription: ""
+    AfterEntryDescription: ""
+    ResourceLimits: ""
+
+Authentication:
+  Container:
+    BeforeContent: ""
+    AfterContent: ""
+
+Account:
+  Overview:
+    BeforeContent: ""
+    AfterContent: ""
+  API:
+    BeforeContent: ""
+    AfterContent: ""
+  SSH:
+    BeforeContent: ""
+    AfterContent: ""
+
+Server:
+  Terminal:
+    BeforeContent: ""
+    AdditionalPowerButtons: ""
+    BeforeInformation: ""
+    AfterInformation: ""
+    CommandRow: ""
+    AfterContent: ""
+  Files:
+    Browse:
+      BeforeContent: ""
+      FileButtons: ""
+      DropdownItems: ""
+      AfterContent: ""
+    Edit:
+      BeforeEdit: ""
+      AfterEdit: ""
+  Databases:
+    BeforeContent: ""
+    AfterContent: ""
+  Schedules:
+    List:
+      BeforeContent: ""
+      AfterContent: ""
+    Edit:
+      BeforeEdit: ""
+      AfterEdit: ""
+  Users:
+    BeforeContent: ""
+    AfterContent: ""
+  Backups:
+    BeforeContent: ""
+    DropdownItems: ""
+    AfterContent: ""
+  Network:
+    BeforeContent: ""
+    AfterContent: ""
+  Startup:
+    BeforeContent: ""
+    AfterContent: ""
+  Settings:
+    BeforeContent: ""
+    AfterContent: ""

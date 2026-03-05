@@ -1,0 +1,1 @@
+../../../.blueprint/extensions/subdomainmanager/routers/client.php
