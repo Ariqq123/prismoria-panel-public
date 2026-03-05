@@ -57,6 +57,10 @@ git push origin main
 
 For full deployment details, see [`scripts/GITHUB_DEPLOY.md`](scripts/GITHUB_DEPLOY.md).
 
+### Module Guides
+
+- Auto Backup (Google Drive, S3, Dropbox, local + external servers): [`docs/AUTO_BACKUPS.md`](docs/AUTO_BACKUPS.md)
+
 
 
 <!-- Introduction -->

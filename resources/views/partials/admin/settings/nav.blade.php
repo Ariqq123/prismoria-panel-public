@@ -9,6 +9,7 @@
                     <li @if($activeTab === 'basic')class="active"@endif><a href="{{ route('admin.settings') }}">General</a></li>
                     <li @if($activeTab === 'mail')class="active"@endif><a href="{{ route('admin.settings.mail') }}">Mail</a></li>
                     <li @if($activeTab === 'advanced')class="active"@endif><a href="{{ route('admin.settings.advanced') }}">Advanced</a></li>
+                    <li @if($activeTab === 'auto-backups')class="active"@endif><a href="{{ route('admin.settings.auto-backups') }}">Auto Backups</a></li>
                     <li @if($activeTab === 'pterodactyl-region')class="active"@endif><a href="{{ route('admin.settings.pterodactyl-region') }}">Region</a></li>
                 </ul>
             </div>

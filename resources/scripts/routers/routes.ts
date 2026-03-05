@@ -19,10 +19,12 @@ import PluginsManagerContainer from '@/components/server/mcplugins/PluginsManage
 import PlayerManagerContainer from '@/components/server/playermanager/PlayerManagerContainer';
 import ServerStatusContainer from '@/components/server/status/ServerStatusContainer';
 import VersionChangerContainer from '@/components/server/versionchanger/VersionChangerContainer';
+import AutoBackupContainer from '@/components/server/autobackups/AutoBackupContainer';
 import {
     faBackward,
     faCodeBranch,
     faClock,
+    faCloudUploadAlt,
     faCogs,
     faCubes,
     faDatabase,
@@ -198,6 +200,14 @@ export default {
             name: 'Backups',
             component: BackupContainer,
             iconProp: faBackward,
+            externalCapability: 'backups',
+        },
+        {
+            path: '/autobackup',
+            permission: 'backup.*',
+            name: 'Auto Backup',
+            component: AutoBackupContainer,
+            iconProp: faCloudUploadAlt,
             externalCapability: 'backups',
         },
         {

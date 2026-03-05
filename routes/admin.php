@@ -68,6 +68,7 @@ Route::group(['prefix' => 'settings'], function () {
     Route::get('/', [Admin\Settings\IndexController::class, 'index'])->name('admin.settings');
     Route::get('/mail', [Admin\Settings\MailController::class, 'index'])->name('admin.settings.mail');
     Route::get('/advanced', [Admin\Settings\AdvancedController::class, 'index'])->name('admin.settings.advanced');
+    Route::get('/auto-backups', [Admin\Settings\AutoBackupsController::class, 'index'])->name('admin.settings.auto-backups');
     Route::get('/pterodactyl-region', [Admin\Settings\PterodactylRegionController::class, 'index'])
         ->name('admin.settings.pterodactyl-region');
 
@@ -76,6 +77,7 @@ Route::group(['prefix' => 'settings'], function () {
     Route::patch('/', [Admin\Settings\IndexController::class, 'update']);
     Route::patch('/mail', [Admin\Settings\MailController::class, 'update']);
     Route::patch('/advanced', [Admin\Settings\AdvancedController::class, 'update']);
+    Route::patch('/auto-backups', [Admin\Settings\AutoBackupsController::class, 'update'])->name('admin.settings.auto-backups.update');
     Route::patch('/pterodactyl-region', [Admin\Settings\PterodactylRegionController::class, 'update'])
         ->name('admin.settings.pterodactyl-region.update');
 });

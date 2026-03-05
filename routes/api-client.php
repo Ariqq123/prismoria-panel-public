@@ -165,6 +165,14 @@ Route::group([
         Route::delete('/{backup}', [Client\External\Servers\BackupController::class, 'delete']);
     });
 
+    Route::group(['prefix' => '/auto-backups'], function () {
+        Route::get('/', [Client\External\Servers\AutoBackupController::class, 'index']);
+        Route::post('/', [Client\External\Servers\AutoBackupController::class, 'store']);
+        Route::post('/{autoBackup}/run', [Client\External\Servers\AutoBackupController::class, 'run']);
+        Route::post('/{autoBackup}', [Client\External\Servers\AutoBackupController::class, 'update']);
+        Route::delete('/{autoBackup}', [Client\External\Servers\AutoBackupController::class, 'delete']);
+    });
+
     Route::group(['prefix' => '/startup'], function () {
         Route::get('/', [Client\External\Servers\StartupController::class, 'index']);
         Route::put('/variable', [Client\External\Servers\StartupController::class, 'update']);
@@ -266,6 +274,14 @@ Route::group([
         Route::post('/{backup}/lock', [Client\Servers\BackupController::class, 'toggleLock']);
         Route::post('/{backup}/restore', [Client\Servers\BackupController::class, 'restore']);
         Route::delete('/{backup}', [Client\Servers\BackupController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => '/auto-backups'], function () {
+        Route::get('/', [Client\Servers\AutoBackupController::class, 'index']);
+        Route::post('/', [Client\Servers\AutoBackupController::class, 'store']);
+        Route::post('/{autoBackup}/run', [Client\Servers\AutoBackupController::class, 'run']);
+        Route::post('/{autoBackup}', [Client\Servers\AutoBackupController::class, 'update']);
+        Route::delete('/{autoBackup}', [Client\Servers\AutoBackupController::class, 'delete']);
     });
 
     Route::group(['prefix' => '/startup'], function () {
