@@ -435,6 +435,12 @@ class AutoBackupManagerService
             throw new RuntimeException('This user no longer has backup.create permission on the server.');
         }
 
+        if ((int) $server->backup_limit <= 0) {
+            throw new RuntimeException(
+                'Auto backup cannot run because this server backup limit is 0. Increase backup limit in Admin > Servers > Build Configuration.'
+            );
+        }
+
         $ignored = preg_split('/\r\n|\r|\n/', (string) ($profile->ignored_files ?? '')) ?: [];
         $backup = $this->initiateBackupService
             ->setIgnoredFiles($ignored)
