@@ -13,6 +13,50 @@
   <a href="https://blueprint.zip/docs">Documentation</a>
 </p>
 
+<!-- Prismoria Setup -->
+<br/><h2 align="center">🚀 Prismoria Panel Setup</h2>
+
+This repository contains the custom Prismoria panel build (Pterodactyl + Blueprint extensions + custom modules).
+
+### Install On A New VPS
+
+```bash
+sudo apt-get update -y && sudo apt-get install -y git
+sudo git clone https://github.com/Ariqq123/prismoria-panel.git /var/www/pterodactyl
+cd /var/www/pterodactyl
+sudo bash scripts/auto-setup-from-repo.sh \
+  --panel-dir /var/www/pterodactyl \
+  --domain panel.example.com \
+  --letsencrypt-email admin@example.com
+```
+
+Optional install flags:
+
+```bash
+--db-name panel
+--db-user pterodactyl
+--db-pass '<strong-password>'
+--db-root-user root
+--db-root-pass '<mariadb-root-password>'
+--db-dump /root/panel-db.sql.gz
+--redis-version auto
+--php-version 8.3
+--build-assets
+```
+
+### Commit And Push Changes
+
+```bash
+cd /var/www/pterodactyl
+git checkout main
+git pull --ff-only origin main
+git add .
+git commit -m "Describe your panel change"
+git push origin main
+```
+
+For full deployment details, see [`scripts/GITHUB_DEPLOY.md`](scripts/GITHUB_DEPLOY.md).
+
 
 
 <!-- Introduction -->
