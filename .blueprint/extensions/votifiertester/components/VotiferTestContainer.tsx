@@ -15,6 +15,80 @@ import Button from '@/components/elements/Button';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import useFlash from '@/plugins/useFlash';
 import MessageBox from '@/components/MessageBox';
+import styled, { keyframes } from 'styled-components/macro';
+
+const borderFlow = keyframes`
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+`;
+
+const auroraText = keyframes`
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+`;
+
+const MainLayout = styled.div`
+    ${tw`w-full max-w-5xl mx-auto space-y-4`};
+`;
+
+const MagicCard = styled.div<{ $interactive?: boolean }>`
+    ${tw`relative overflow-hidden rounded-xl border border-neutral-700 p-4 md:p-5`};
+    background: linear-gradient(140deg, rgba(17, 24, 39, 0.93) 0%, rgba(9, 13, 20, 0.96) 56%, rgba(16, 18, 24, 0.98) 100%);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease, box-shadow 220ms ease;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -35% -12%;
+        pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(248, 113, 113, 0.16), transparent 58%);
+    }
+
+    ${({ $interactive }) =>
+        $interactive
+            ? `
+        &:hover {
+            transform: translateY(-2px);
+            border-color: rgba(248, 113, 113, 0.46);
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.38);
+        }
+    `
+            : ''}
+`;
+
+const ShineBorder = styled.div`
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid transparent;
+    background: linear-gradient(
+            125deg,
+            rgba(248, 113, 113, 0.44),
+            rgba(251, 191, 36, 0.32),
+            rgba(96, 165, 250, 0.28),
+            rgba(248, 113, 113, 0.44)
+        )
+        border-box;
+    background-size: 250% 250%;
+    animation: ${borderFlow} 6s ease infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+`;
+
+const HeroTitle = styled.h2`
+    ${tw`text-lg md:text-xl font-semibold tracking-wide`};
+    background: linear-gradient(96deg, #fde68a, #fca5a5, #93c5fd, #fca5a5);
+    background-size: 220% 220%;
+    animation: ${auroraText} 7.2s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+`;
 
 interface Values {
     host: string;
@@ -61,15 +135,18 @@ const VotifierTestContainer: React.FC = () => {
 
     return (
         <ServerContentBlock title={'Votifier Tester'} className={'content-dashboard'} css={tw`space-y-4`}>
-            <div css={tw`w-full max-w-5xl mx-auto space-y-4`}>
+            <MainLayout>
                 <FlashMessageRender byKey={'server:votifier'} css={tw`mb-4`} />
 
-                <div css={tw`rounded-lg border border-neutral-800 bg-neutral-900 shadow-md px-4 py-4 md:px-5`}>
-                    <h2 css={tw`text-lg md:text-xl text-neutral-100 font-semibold`}>Minecraft Vote Sender</h2>
-                    <p css={tw`text-sm text-neutral-400 mt-1`}>
-                        Send a test vote to your server without leaving the panel.
-                    </p>
-                </div>
+                <MagicCard>
+                    <ShineBorder />
+                    <div css={tw`relative z-10`}>
+                        <HeroTitle>Minecraft Vote Sender</HeroTitle>
+                        <p css={tw`text-sm text-neutral-300 mt-1`}>
+                            Kirim vote test ke server langsung dari panel tanpa akses shell.
+                        </p>
+                    </div>
+                </MagicCard>
 
                 <Formik<Values>
                     initialValues={{
@@ -97,9 +174,10 @@ const VotifierTestContainer: React.FC = () => {
                     onSubmit={submit}
                 >
                     {({ values, isSubmitting }) => (
-                        <TitledGreyBox title={'Send Test Vote'} css={tw`relative`}>
-                            <SpinnerOverlay visible={isLoading || isSubmitting} />
-                            <Form css={tw`mb-0 space-y-4`}>
+                        <MagicCard $interactive>
+                            <TitledGreyBox title={'Send Test Vote'} css={tw`relative`}>
+                                <SpinnerOverlay visible={isLoading || isSubmitting} />
+                                <Form css={tw`mb-0 space-y-4`}>
                                 <div css={tw`grid grid-cols-1 md:grid-cols-2 gap-4`}>
                                     <Field
                                         id={'votifier-host'}
@@ -167,15 +245,18 @@ const VotifierTestContainer: React.FC = () => {
                                         Send Test Vote
                                     </Button>
                                 </div>
-                            </Form>
-                        </TitledGreyBox>
+                                </Form>
+                            </TitledGreyBox>
+                        </MagicCard>
                     )}
                 </Formik>
 
-                <MessageBox type={'info'} title={'Supported Modes'}>
-                    Classic Votifier, NuVotifier (public key), and NuVotifier v2 (token) are supported.
-                </MessageBox>
-            </div>
+                <MagicCard $interactive>
+                    <MessageBox type={'info'} title={'Supported Modes'}>
+                        Classic Votifier, NuVotifier (public key), and NuVotifier v2 (token) are supported.
+                    </MessageBox>
+                </MagicCard>
+            </MainLayout>
         </ServerContentBlock>
     );
 };

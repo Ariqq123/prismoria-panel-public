@@ -17,7 +17,7 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 import GreyRowBox from '@/components/elements/GreyRowBox';
-import styled from 'styled-components/macro';
+import styled, { keyframes } from 'styled-components/macro';
 import MessageBox from '@/components/MessageBox';
 import DeleteSubdomainButton from '@/blueprint/extensions/subdomainmanager/DeleteSubdomainButton';
 import createServerSubdomain from '@/blueprint/extensions/subdomainmanager/api/createServerSubdomain';
@@ -25,6 +25,87 @@ import getServerSubdomains from '@/blueprint/extensions/subdomainmanager/api/get
 import getMin3AvailableDomains, { Min3AvailableDomainItem } from '@/blueprint/extensions/subdomainmanager/api/getMin3AvailableDomains';
 
 const Code = styled.code`${tw`font-mono py-1 px-2 bg-neutral-900 rounded text-sm inline-block break-all`}`;
+
+const borderFlow = keyframes`
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+`;
+
+const auroraText = keyframes`
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+`;
+
+const MainLayout = styled.div`
+    ${tw`w-full max-w-6xl mx-auto space-y-4`};
+`;
+
+const MagicCard = styled.div<{ $interactive?: boolean }>`
+    ${tw`relative overflow-hidden rounded-xl border border-neutral-700 p-4 md:p-5`};
+    background: linear-gradient(140deg, rgba(17, 24, 39, 0.93) 0%, rgba(9, 13, 20, 0.96) 56%, rgba(16, 18, 24, 0.98) 100%);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease, box-shadow 220ms ease;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -35% -12%;
+        pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(248, 113, 113, 0.16), transparent 58%);
+    }
+
+    ${({ $interactive }) =>
+        $interactive
+            ? `
+        &:hover {
+            transform: translateY(-2px);
+            border-color: rgba(248, 113, 113, 0.46);
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.38);
+        }
+    `
+            : ''}
+`;
+
+const ShineBorder = styled.div`
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid transparent;
+    background: linear-gradient(
+            125deg,
+            rgba(248, 113, 113, 0.44),
+            rgba(251, 191, 36, 0.32),
+            rgba(96, 165, 250, 0.28),
+            rgba(248, 113, 113, 0.44)
+        )
+        border-box;
+    background-size: 250% 250%;
+    animation: ${borderFlow} 6s ease infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+`;
+
+const HeroTitle = styled.h2`
+    ${tw`text-lg md:text-xl font-semibold tracking-wide`};
+    background: linear-gradient(96deg, #fde68a, #fca5a5, #93c5fd, #fca5a5);
+    background-size: 220% 220%;
+    animation: ${auroraText} 7.2s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+`;
+
+const ActionDock = styled.div`
+    ${tw`flex items-center gap-2`};
+`;
+
+const InfoChip = styled.div`
+    ${tw`rounded-lg border border-neutral-700 bg-black/30 px-3 py-2`};
+`;
 
 interface SubdomainItem {
     id: number;
@@ -220,46 +301,62 @@ export default () => {
 
     return (
         <ServerContentBlock title={'Subdomain Manager'} className={'content-dashboard'} css={tw`space-y-4`}>
-            <div css={tw`w-full max-w-6xl mx-auto space-y-4`}>
+            <MainLayout>
                 <FlashMessageRender byKey={'server:subdomain'} css={tw`mb-4`} />
 
                 {!data ? (
-                    <Spinner size={'large'} centered />
+                    <MagicCard>
+                        <Spinner size={'large'} centered />
+                    </MagicCard>
                 ) : (
                     <div css={tw`space-y-4`}>
-                        <div css={tw`rounded-lg border border-neutral-800 bg-neutral-900 shadow-md px-4 py-4 md:px-5`}>
-                            <div css={tw`flex flex-col gap-3 md:flex-row md:items-center md:justify-between`}>
-                                <div>
-                                    <div css={tw`flex flex-wrap items-center gap-2`}>
-                                        <h2 css={tw`text-lg md:text-xl text-neutral-100 font-semibold`}>Server Subdomains</h2>
-                                        {isExternalServer && (
-                                            <span
-                                                css={tw`inline-flex items-center rounded-md border border-red-500/40 bg-red-500/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-red-300`}
-                                            >
-                                                External
-                                            </span>
-                                        )}
+                        <MagicCard>
+                            <ShineBorder />
+                            <div css={tw`relative z-10 space-y-4`}>
+                                <div css={tw`flex flex-col gap-3 md:flex-row md:items-center md:justify-between`}>
+                                    <div>
+                                        <div css={tw`flex flex-wrap items-center gap-2`}>
+                                            <HeroTitle>Server Subdomains</HeroTitle>
+                                            {isExternalServer && (
+                                                <span
+                                                    css={tw`inline-flex items-center rounded-md border border-red-500/40 bg-red-500/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-red-300`}
+                                                >
+                                                    External
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p css={tw`text-sm text-neutral-300 mt-1`}>
+                                            Buat dan kelola DNS record (CNAME/A/SRV) langsung dari panel.
+                                        </p>
                                     </div>
-                                    <p css={tw`text-sm text-neutral-400 mt-1`}>
-                                        Create and manage DNS records for this server.
-                                    </p>
+                                    <ActionDock>
+                                        <Button
+                                            size={'xsmall'}
+                                            isSecondary
+                                            isLoading={isValidating}
+                                            css={tw`normal-case tracking-normal`}
+                                            onClick={() => mutate()}
+                                        >
+                                            Refresh
+                                        </Button>
+                                    </ActionDock>
                                 </div>
-                                <div css={tw`flex items-center gap-2`}>
-                                    <span css={tw`px-3 py-1 rounded bg-neutral-800 text-neutral-300 text-xs font-medium`}>
-                                        Entries: {data.subdomains.length}
-                                    </span>
-                                    <Button
-                                        size={'xsmall'}
-                                        isSecondary
-                                        isLoading={isValidating}
-                                        css={tw`normal-case tracking-normal`}
-                                        onClick={() => mutate()}
-                                    >
-                                        Refresh
-                                    </Button>
+                                <div css={tw`grid grid-cols-1 sm:grid-cols-3 gap-2`}>
+                                    <InfoChip>
+                                        <p css={tw`text-[11px] uppercase tracking-widest text-neutral-400 mb-1`}>Entries</p>
+                                        <p css={tw`text-sm text-neutral-100`}>{data.subdomains.length}</p>
+                                    </InfoChip>
+                                    <InfoChip>
+                                        <p css={tw`text-[11px] uppercase tracking-widest text-neutral-400 mb-1`}>Provider Domains</p>
+                                        <p css={tw`text-sm text-neutral-100`}>{domainOptions.length}</p>
+                                    </InfoChip>
+                                    <InfoChip>
+                                        <p css={tw`text-[11px] uppercase tracking-widest text-neutral-400 mb-1`}>Server Type</p>
+                                        <p css={tw`text-sm text-neutral-100`}>{isExternalServer ? 'External' : 'Local'}</p>
+                                    </InfoChip>
                                 </div>
                             </div>
-                        </div>
+                        </MagicCard>
 
                         <div css={tw`space-y-4`}>
                             {isExternalServer && data.usingFallbackDomains ? (
@@ -270,7 +367,8 @@ export default () => {
                             ) : null}
                             <div css={tw`grid grid-cols-1 xl:grid-cols-3 gap-4`}>
                                 <div css={tw`xl:col-span-2 space-y-2`}>
-                                    <TitledGreyBox title={'Create Subdomain'}>
+                                    <MagicCard $interactive>
+                                        <TitledGreyBox title={'Create Subdomain'}>
                                         <div css={tw`px-1 py-2`}>
                                             <Formik
                                                 onSubmit={submit}
@@ -412,70 +510,78 @@ export default () => {
                                                 }}
                                             </Formik>
                                         </div>
-                                    </TitledGreyBox>
+                                        </TitledGreyBox>
+                                    </MagicCard>
 
                                     {data.subdomains.length < 1 ? (
-                                        <p css={tw`text-center text-sm text-neutral-400 pt-4 pb-4`}>
-                                            There are no subdomains for this server.
-                                        </p>
+                                        <MagicCard>
+                                            <p css={tw`relative z-10 text-center text-sm text-neutral-400 pt-2 pb-2`}>
+                                                There are no subdomains for this server.
+                                            </p>
+                                        </MagicCard>
                                     ) : (
                                         data.subdomains.map((item) => (
-                                            <GreyRowBox
-                                                $hoverable={false}
-                                                css={tw`mt-2 flex-col gap-4 md:flex-row md:items-center md:justify-between`}
-                                                key={item.id}
-                                            >
-                                                <div css={tw`flex items-start gap-4 min-w-0`}>
-                                                    <div css={tw`text-neutral-400 pt-1`}>
-                                                        <FontAwesomeIcon icon={faNetworkWired} />
-                                                    </div>
-                                                    <div css={tw`grid grid-cols-1 md:grid-cols-2 gap-3 min-w-0`}>
-                                                        <div css={tw`min-w-0`}>
-                                                            <Code>
-                                                                {item.subdomain}.{item.domain}
-                                                                {item.record_type !== 'SRV' ? `:${item.port}` : ''}
-                                                            </Code>
-                                                            {item.record_type === 'SRV' ? (
-                                                                <p css={tw`text-xs text-neutral-400 mt-1`}>
-                                                                    {item.srv_service || '_service'} / _
-                                                                    {item.srv_protocol_type || 'tcp'} | prio{' '}
-                                                                    {item.srv_priority ?? 1} | weight {item.srv_weight ?? 1} | port{' '}
-                                                                    {item.srv_port ?? item.port}
-                                                                </p>
-                                                            ) : null}
-                                                            <Label>Subdomain</Label>
+                                            <MagicCard $interactive key={item.id}>
+                                                <div css={tw`relative z-10 flex-col gap-4 md:flex-row md:items-center md:justify-between`}>
+                                                    <GreyRowBox
+                                                        $hoverable={false}
+                                                        css={tw`mt-0 flex-col gap-4 md:flex-row md:items-center md:justify-between bg-transparent border-0 shadow-none p-0`}
+                                                    >
+                                                        <div css={tw`flex items-start gap-4 min-w-0`}>
+                                                            <div css={tw`text-neutral-400 pt-1`}>
+                                                                <FontAwesomeIcon icon={faNetworkWired} />
+                                                            </div>
+                                                            <div css={tw`grid grid-cols-1 md:grid-cols-2 gap-3 min-w-0`}>
+                                                                <div css={tw`min-w-0`}>
+                                                                    <Code>
+                                                                        {item.subdomain}.{item.domain}
+                                                                        {item.record_type !== 'SRV' ? `:${item.port}` : ''}
+                                                                    </Code>
+                                                                    {item.record_type === 'SRV' ? (
+                                                                        <p css={tw`text-xs text-neutral-400 mt-1`}>
+                                                                            {item.srv_service || '_service'} / _
+                                                                            {item.srv_protocol_type || 'tcp'} | prio{' '}
+                                                                            {item.srv_priority ?? 1} | weight {item.srv_weight ?? 1} | port{' '}
+                                                                            {item.srv_port ?? item.port}
+                                                                        </p>
+                                                                    ) : null}
+                                                                    <Label>Subdomain</Label>
+                                                                </div>
+                                                                <div css={tw`min-w-0`}>
+                                                                    <Code>
+                                                                        {data.ipAlias || 'Allocation missing'}
+                                                                        {item.port ? `:${item.port}` : ''}
+                                                                    </Code>
+                                                                    <Label>Server Allocation</Label>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div css={tw`min-w-0`}>
-                                                            <Code>
-                                                                {data.ipAlias || 'Allocation missing'}
-                                                                {item.port ? `:${item.port}` : ''}
-                                                            </Code>
-                                                            <Label>Server Allocation</Label>
+                                                        <div css={tw`w-full md:w-auto text-right`}>
+                                                            <DeleteSubdomainButton subdomainId={item.id} onDeleted={() => mutate()} />
                                                         </div>
-                                                    </div>
+                                                    </GreyRowBox>
                                                 </div>
-                                                <div css={tw`w-full md:w-auto text-right`}>
-                                                    <DeleteSubdomainButton subdomainId={item.id} onDeleted={() => mutate()} />
-                                                </div>
-                                            </GreyRowBox>
+                                            </MagicCard>
                                         ))
                                     )}
                                 </div>
                                 <div css={tw`space-y-2`}>
-                                    <TitledGreyBox title={'Help'}>
-                                        <div css={tw`px-1 py-2 text-sm text-neutral-300 leading-relaxed`}>
-                                            Use an alphanumeric subdomain (hyphen allowed), then pick a configured root domain. If
-                                            SRV is enabled for the selected egg, the manager will create SRV records; otherwise it
-                                            creates CNAME records (or A records when the server target is an IP). Min3 domains are
-                                            fetched from Min3 availability for your typed subdomain.
-                                        </div>
-                                    </TitledGreyBox>
+                                    <MagicCard $interactive>
+                                        <TitledGreyBox title={'Help'}>
+                                            <div css={tw`px-1 py-2 text-sm text-neutral-300 leading-relaxed`}>
+                                                Use an alphanumeric subdomain (hyphen allowed), then pick a configured root domain. If
+                                                SRV is enabled for the selected egg, the manager will create SRV records; otherwise it
+                                                creates CNAME records (or A records when the server target is an IP). Min3 domains are
+                                                fetched from Min3 availability for your typed subdomain.
+                                            </div>
+                                        </TitledGreyBox>
+                                    </MagicCard>
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
-            </div>
+            </MainLayout>
         </ServerContentBlock>
     );
 };
