@@ -18,11 +18,31 @@
 
 This repository contains the custom Prismoria panel build (Pterodactyl + Blueprint extensions + custom modules).
 
+### What Is Included
+
+- Prismoria UI/UX customization (Nook-style layout, dock, dark/light mode, themed components).
+- External panel integration (external servers, API connections, and external websocket proxy support).
+- Custom modules: server backgrounds, player manager, subdomain manager, version changer, status, votifier tester, mclogs integration, and more.
+- Auto-backup system with provider support (Google Drive, S3, Dropbox) for local and external servers.
+- Installer and migration scripts for fresh VPS deployment.
+
 ### Install On A New VPS
 
 ```bash
 sudo apt-get update -y && sudo apt-get install -y git
 sudo git clone https://github.com/Ariqq123/prismoria-panel.git /var/www/pterodactyl
+cd /var/www/pterodactyl
+sudo bash scripts/auto-setup-from-repo.sh \
+  --panel-dir /var/www/pterodactyl \
+  --domain panel.example.com \
+  --letsencrypt-email admin@example.com
+```
+
+Public mirror:
+
+```bash
+sudo apt-get update -y && sudo apt-get install -y git
+sudo git clone https://github.com/Ariqq123/prismoria-panel-public.git /var/www/pterodactyl
 cd /var/www/pterodactyl
 sudo bash scripts/auto-setup-from-repo.sh \
   --panel-dir /var/www/pterodactyl \
@@ -44,7 +64,23 @@ Optional install flags:
 --build-assets
 ```
 
-### Commit And Push Changes
+### Post-Install Health Checks
+
+```bash
+sudo systemctl status redis-server --no-pager
+sudo systemctl status pteroq --no-pager
+sudo systemctl status nginx --no-pager
+sudo php artisan p:environment:database
+sudo php artisan queue:failed
+```
+
+If queue/redis fails after migration or restore, verify ownership:
+
+```bash
+sudo chown -R www-data:www-data /var/www/pterodactyl/storage /var/www/pterodactyl/bootstrap/cache
+```
+
+### Commit And Push Changes (Private + Public)
 
 ```bash
 cd /var/www/pterodactyl
@@ -53,6 +89,7 @@ git pull --ff-only origin main
 git add .
 git commit -m "Describe your panel change"
 git push origin main
+git push public main
 ```
 
 For full deployment details, see [`scripts/GITHUB_DEPLOY.md`](scripts/GITHUB_DEPLOY.md).
@@ -60,6 +97,7 @@ For full deployment details, see [`scripts/GITHUB_DEPLOY.md`](scripts/GITHUB_DEP
 ### Module Guides
 
 - Auto Backup (Google Drive, S3, Dropbox, local + external servers): [`docs/AUTO_BACKUPS.md`](docs/AUTO_BACKUPS.md)
+- DriveBackupV2 local bridge setup: [`docs/DRIVEBACKUPV2_SETUP.md`](docs/DRIVEBACKUPV2_SETUP.md)
 
 
 
