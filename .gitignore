@@ -39,7 +39,7 @@ release
 # Local/generated runtime state
 storage/logs/*
 storage/debugbar/*
-backups/
+/backups/
 element_clones/
 .desloppify/
 
