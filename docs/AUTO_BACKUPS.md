@@ -51,17 +51,28 @@ Fill the form:
 
 ### Google Drive
 
-Required:
+Simple mode (recommended):
+- `service_account_json` (paste full JSON key)
+- Optional: `folder_id`
+
+Advanced mode (OAuth):
 - `client_id`
 - `client_secret`
 - `refresh_token`
+- Optional: `folder_id`
 
-Optional:
-- `folder_id`
+Service account note:
+- Share the destination Google Drive folder with the service account email from the JSON key.
+- No refresh token rotation is required.
 
-OAuth note:
-- Use offline consent to obtain a refresh token.
-- The module refreshes access tokens automatically during upload.
+OAuth helper (quick refresh token generation):
+
+```bash
+cd /var/www/pterodactyl
+./scripts/google-drive-oauth-refresh-token.sh
+```
+
+The script prints the OAuth URL, asks for the authorization code, then outputs the refresh token for panel settings.
 
 ### S3 Bucket
 

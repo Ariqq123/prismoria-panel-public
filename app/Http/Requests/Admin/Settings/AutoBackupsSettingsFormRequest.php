@@ -15,9 +15,11 @@ class AutoBackupsSettingsFormRequest extends AdminFormRequest
             'auto_backups:default_interval_minutes' => 'required|integer|between:5,10080',
             'auto_backups:default_keep_remote' => 'required|integer|between:1,1000',
 
+            'auto_backups:google_drive:auth_mode' => 'nullable|in:oauth,service_account',
             'auto_backups:google_drive:client_id' => 'nullable|string|max:512',
             'auto_backups:google_drive:client_secret' => 'nullable|string|max:4096',
             'auto_backups:google_drive:refresh_token' => 'nullable|string|max:4096',
+            'auto_backups:google_drive:service_account_json' => 'nullable|string|max:30000',
             'auto_backups:google_drive:folder_id' => 'nullable|string|max:512',
 
             'auto_backups:s3:bucket' => 'nullable|string|max:255',
@@ -41,9 +43,11 @@ class AutoBackupsSettingsFormRequest extends AdminFormRequest
             'auto_backups:default_destination_type' => 'Default Destination Type',
             'auto_backups:default_interval_minutes' => 'Default Interval',
             'auto_backups:default_keep_remote' => 'Default Keep Remote',
+            'auto_backups:google_drive:auth_mode' => 'Google Drive Auth Mode',
             'auto_backups:google_drive:client_id' => 'Google Drive Client ID',
             'auto_backups:google_drive:client_secret' => 'Google Drive Client Secret',
             'auto_backups:google_drive:refresh_token' => 'Google Drive Refresh Token',
+            'auto_backups:google_drive:service_account_json' => 'Google Drive Service Account JSON',
             'auto_backups:google_drive:folder_id' => 'Google Drive Folder ID',
             'auto_backups:s3:bucket' => 'S3 Bucket',
             'auto_backups:s3:region' => 'S3 Region',
@@ -57,4 +61,3 @@ class AutoBackupsSettingsFormRequest extends AdminFormRequest
         ];
     }
 }
-

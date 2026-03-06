@@ -80,14 +80,36 @@
                         <h3 class="box-title">Google Drive Defaults</h3>
                     </div>
                     <div class="box-body">
+                        @php($googleAuthMode = old('auto_backups:google_drive:auth_mode', $settings['destinations']['google_drive']['auth_mode'] ?? 'oauth'))
                         <div class="row">
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
+                                <label class="control-label">Auth Mode</label>
+                                <select class="form-control" name="auto_backups:google_drive:auth_mode">
+                                    <option value="service_account" @if($googleAuthMode === 'service_account') selected @endif>Service Account (Recommended)</option>
+                                    <option value="oauth" @if($googleAuthMode === 'oauth') selected @endif>OAuth Client + Refresh Token</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="control-label">Folder ID <span class="field-optional"></span></label>
+                                <input type="text" class="form-control" name="auto_backups:google_drive:folder_id" value="{{ old('auto_backups:google_drive:folder_id', $settings['destinations']['google_drive']['folder_id']) }}" />
+                            </div>
+                            <div class="form-group col-md-4">
                                 <label class="control-label">Client ID</label>
                                 <input type="text" class="form-control" name="auto_backups:google_drive:client_id" value="{{ old('auto_backups:google_drive:client_id', $settings['destinations']['google_drive']['client_id']) }}" />
                             </div>
-                            <div class="form-group col-md-6">
-                                <label class="control-label">Folder ID <span class="field-optional"></span></label>
-                                <input type="text" class="form-control" name="auto_backups:google_drive:folder_id" value="{{ old('auto_backups:google_drive:folder_id', $settings['destinations']['google_drive']['folder_id']) }}" />
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Service Account JSON <span class="field-optional"></span></label>
+                                <textarea class="form-control" rows="6" name="auto_backups:google_drive:service_account_json"></textarea>
+                                <p class="text-muted small">
+                                    @if($settings['has_secrets']['google_drive:service_account_json'] ?? false)
+                                        Currently configured. Leave blank to keep existing, use <code>!clear</code> to remove.
+                                    @else
+                                        Paste the full Google service account JSON key. Leave blank to keep empty.
+                                    @endif
+                                </p>
+                                <p class="text-muted small">
+                                    Share your destination folder with the service account email from that JSON file.
+                                </p>
                             </div>
                             <div class="form-group col-md-6">
                                 <label class="control-label">Client Secret <span class="field-optional"></span></label>
@@ -196,4 +218,3 @@
         </div>
     </div>
 @endsection
-

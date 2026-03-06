@@ -377,6 +377,29 @@ class AutoBackupDestinationUploader
      */
     protected function googleDriveAccessToken(array $config): string
     {
+        $authMode = strtolower(trim((string) ($config['auth_mode'] ?? '')));
+        $serviceAccountJson = trim((string) ($config['service_account_json'] ?? ''));
+
+        if ($authMode === 'service_account') {
+            return $this->googleDriveAccessTokenFromServiceAccount($serviceAccountJson);
+        }
+
+        if ($authMode === 'oauth') {
+            return $this->googleDriveAccessTokenFromOauth($config);
+        }
+
+        if ($serviceAccountJson !== '') {
+            return $this->googleDriveAccessTokenFromServiceAccount($serviceAccountJson);
+        }
+
+        return $this->googleDriveAccessTokenFromOauth($config);
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    protected function googleDriveAccessTokenFromOauth(array $config): string
+    {
         $clientId = trim((string) ($config['client_id'] ?? ''));
         $clientSecret = trim((string) ($config['client_secret'] ?? ''));
         $refreshToken = trim((string) ($config['refresh_token'] ?? ''));
@@ -402,6 +425,87 @@ class AutoBackupDestinationUploader
         }
 
         return $token;
+    }
+
+    protected function googleDriveAccessTokenFromServiceAccount(string $serviceAccountJson): string
+    {
+        $serviceAccount = $this->parseGoogleServiceAccount($serviceAccountJson);
+        $now = time();
+
+        $header = $this->base64UrlEncode((string) json_encode([
+            'alg' => 'RS256',
+            'typ' => 'JWT',
+        ], JSON_UNESCAPED_SLASHES));
+
+        $payload = $this->base64UrlEncode((string) json_encode([
+            'iss' => $serviceAccount['client_email'],
+            'scope' => 'https://www.googleapis.com/auth/drive.file',
+            'aud' => 'https://oauth2.googleapis.com/token',
+            'iat' => $now - 5,
+            'exp' => $now + 3600,
+        ], JSON_UNESCAPED_SLASHES));
+
+        $message = $header . '.' . $payload;
+        $signature = '';
+
+        $signed = openssl_sign($message, $signature, $serviceAccount['private_key'], OPENSSL_ALGO_SHA256);
+        if (!$signed || $signature === '') {
+            throw new RuntimeException('Google Drive service account private key could not sign token assertion.');
+        }
+
+        $assertion = $message . '.' . $this->base64UrlEncode($signature);
+
+        $client = $this->httpClient();
+        $response = $client->post('https://oauth2.googleapis.com/token', [
+            'form_params' => [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion' => $assertion,
+            ],
+        ]);
+
+        $data = json_decode((string) $response->getBody(), true);
+        $token = is_array($data) ? (string) ($data['access_token'] ?? '') : '';
+        if ($token === '') {
+            throw new RuntimeException('Google Drive service account access token could not be generated.');
+        }
+
+        return $token;
+    }
+
+    /**
+     * @return array{client_email:string,private_key:string}
+     */
+    protected function parseGoogleServiceAccount(string $raw): array
+    {
+        $payload = json_decode($raw, true);
+        if (!is_array($payload)) {
+            $decoded = base64_decode($raw, true);
+            if (!is_string($decoded)) {
+                throw new RuntimeException('Google service account JSON is invalid.');
+            }
+
+            $payload = json_decode($decoded, true);
+            if (!is_array($payload)) {
+                throw new RuntimeException('Google service account JSON is invalid.');
+            }
+        }
+
+        $clientEmail = trim((string) ($payload['client_email'] ?? ''));
+        $privateKey = str_replace('\\n', "\n", (string) ($payload['private_key'] ?? ''));
+
+        if ($clientEmail === '' || trim($privateKey) === '') {
+            throw new RuntimeException('Google service account JSON must include client_email and private_key.');
+        }
+
+        return [
+            'client_email' => $clientEmail,
+            'private_key' => $privateKey,
+        ];
+    }
+
+    protected function base64UrlEncode(string $input): string
+    {
+        return rtrim(strtr(base64_encode($input), '+/', '-_'), '=');
     }
 
     protected function httpClient(): Client

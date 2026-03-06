@@ -435,17 +435,44 @@ class AutoBackupManagerService
             throw new RuntimeException('This user no longer has backup.create permission on the server.');
         }
 
-        if ((int) $server->backup_limit <= 0) {
-            throw new RuntimeException(
-                'Auto backup cannot run because this server backup limit is 0. Increase backup limit in Admin > Servers > Build Configuration.'
-            );
+        $ignored = preg_split('/\r\n|\r|\n/', (string) ($profile->ignored_files ?? '')) ?: [];
+
+        $originalLimit = (int) $server->backup_limit;
+        $didTemporarilyChangeLimit = false;
+
+        if ($originalLimit <= 0) {
+            $nonFailedBackupCount = Backup::query()
+                ->where('server_id', $server->id)
+                ->where(function ($query) {
+                    $query->whereNull('completed_at')
+                        ->orWhere('is_successful', true);
+                })
+                ->count();
+
+            $temporaryLimit = max(1, $nonFailedBackupCount + 1);
+
+            Server::query()
+                ->where('id', $server->id)
+                ->update(['backup_limit' => $temporaryLimit]);
+
+            $server->backup_limit = $temporaryLimit;
+            $didTemporarilyChangeLimit = true;
         }
 
-        $ignored = preg_split('/\r\n|\r|\n/', (string) ($profile->ignored_files ?? '')) ?: [];
-        $backup = $this->initiateBackupService
-            ->setIgnoredFiles($ignored)
-            ->setIsLocked((bool) $profile->is_locked)
-            ->handle($server, $this->backupName($profile), true);
+        try {
+            $backup = $this->initiateBackupService
+                ->setIgnoredFiles($ignored)
+                ->setIsLocked((bool) $profile->is_locked)
+                ->handle($server, $this->backupName($profile), true);
+        } finally {
+            if ($didTemporarilyChangeLimit) {
+                Server::query()
+                    ->where('id', $server->id)
+                    ->update(['backup_limit' => $originalLimit]);
+
+                $server->backup_limit = $originalLimit;
+            }
+        }
 
         return $backup->uuid;
     }
@@ -579,10 +606,27 @@ class AutoBackupManagerService
         bool $allowUserDestinationOverride
     ): array
     {
+        $sensitiveKeys = match ($type) {
+            'google_drive' => ['client_secret', 'refresh_token', 'service_account_json'],
+            's3' => ['secret_access_key'],
+            'dropbox' => ['access_token'],
+            default => [],
+        };
+        foreach ($sensitiveKeys as $key) {
+            if (!array_key_exists($key, $incoming)) {
+                continue;
+            }
+
+            $value = $incoming[$key];
+            if (is_string($value) && trim($value) === '') {
+                unset($incoming[$key]);
+            }
+        }
+
         $config = array_merge($current, $incoming);
 
         $allowed = match ($type) {
-            'google_drive' => ['client_id', 'client_secret', 'refresh_token', 'folder_id'],
+            'google_drive' => ['auth_mode', 'client_id', 'client_secret', 'refresh_token', 'service_account_json', 'folder_id'],
             's3' => ['bucket', 'region', 'endpoint', 'path_prefix', 'use_path_style', 'access_key_id', 'secret_access_key'],
             'dropbox' => ['folder_path', 'access_token'],
             default => [],
@@ -591,7 +635,6 @@ class AutoBackupManagerService
         $global = Arr::only($global, $allowed);
 
         $required = match ($type) {
-            'google_drive' => ['client_id', 'client_secret', 'refresh_token'],
             's3' => ['bucket', 'region', 'access_key_id', 'secret_access_key'],
             'dropbox' => ['access_token'],
             default => [],
@@ -628,15 +671,6 @@ class AutoBackupManagerService
             }
         }
 
-        foreach ($required as $key) {
-            $value = $normalized[$key] ?? null;
-            if (!is_string($value) || trim($value) === '') {
-                throw ValidationException::withMessages([
-                    "destination_config.$key" => 'This destination field is required.',
-                ]);
-            }
-        }
-
         if ($type === 's3') {
             $normalized['use_path_style'] = (bool) ($normalized['use_path_style'] ?? false);
             $normalized['path_prefix'] = trim((string) ($normalized['path_prefix'] ?? ''), '/');
@@ -648,7 +682,29 @@ class AutoBackupManagerService
         }
 
         if ($type === 'google_drive') {
+            $normalized['auth_mode'] = $this->googleDriveAuthMode($normalized);
             $normalized['folder_id'] = trim((string) ($normalized['folder_id'] ?? ''));
+            $normalized['service_account_json'] = trim((string) ($normalized['service_account_json'] ?? ''));
+
+            $hasOauthCredentials = trim((string) ($normalized['client_id'] ?? '')) !== ''
+                && trim((string) ($normalized['client_secret'] ?? '')) !== ''
+                && trim((string) ($normalized['refresh_token'] ?? '')) !== '';
+            if ($normalized['auth_mode'] === 'service_account' && $normalized['service_account_json'] === '' && $hasOauthCredentials) {
+                $normalized['auth_mode'] = 'oauth';
+            }
+
+            $required = $normalized['auth_mode'] === 'service_account'
+                ? ['service_account_json']
+                : ['client_id', 'client_secret', 'refresh_token'];
+        }
+
+        foreach ($required as $key) {
+            $value = $normalized[$key] ?? null;
+            if (!is_string($value) || trim($value) === '') {
+                throw ValidationException::withMessages([
+                    "destination_config.$key" => 'This destination field is required.',
+                ]);
+            }
         }
 
         return $normalized;
@@ -687,13 +743,28 @@ class AutoBackupManagerService
                 'has_access_token' => trim((string) ($config['access_token'] ?? '')) !== '',
             ],
             'google_drive' => [
+                'auth_mode' => $this->googleDriveAuthMode($config),
                 'folder_id' => (string) ($config['folder_id'] ?? ''),
                 'client_id' => (string) ($config['client_id'] ?? ''),
                 'has_client_secret' => trim((string) ($config['client_secret'] ?? '')) !== '',
                 'has_refresh_token' => trim((string) ($config['refresh_token'] ?? '')) !== '',
+                'has_service_account_json' => trim((string) ($config['service_account_json'] ?? '')) !== '',
             ],
             default => [],
         };
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    protected function googleDriveAuthMode(array $config): string
+    {
+        $mode = strtolower(trim((string) ($config['auth_mode'] ?? '')));
+        if (in_array($mode, ['oauth', 'service_account'], true)) {
+            return $mode;
+        }
+
+        return trim((string) ($config['service_account_json'] ?? '')) !== '' ? 'service_account' : 'oauth';
     }
 
     protected function normalizeServerIdentifier(string $identifier): string

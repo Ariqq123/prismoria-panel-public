@@ -23,9 +23,13 @@ class AutoBackupGlobalSettingsService
 
     private const KEY_GOOGLE_CLIENT_ID = 'google_drive:client_id';
 
+    private const KEY_GOOGLE_AUTH_MODE = 'google_drive:auth_mode';
+
     private const KEY_GOOGLE_CLIENT_SECRET = 'google_drive:client_secret';
 
     private const KEY_GOOGLE_REFRESH_TOKEN = 'google_drive:refresh_token';
+
+    private const KEY_GOOGLE_SERVICE_ACCOUNT_JSON = 'google_drive:service_account_json';
 
     private const KEY_GOOGLE_FOLDER_ID = 'google_drive:folder_id';
 
@@ -50,6 +54,7 @@ class AutoBackupGlobalSettingsService
     private const SECRET_KEYS = [
         self::KEY_GOOGLE_CLIENT_SECRET,
         self::KEY_GOOGLE_REFRESH_TOKEN,
+        self::KEY_GOOGLE_SERVICE_ACCOUNT_JSON,
         self::KEY_S3_SECRET_ACCESS_KEY,
         self::KEY_DROPBOX_ACCESS_TOKEN,
     ];
@@ -93,9 +98,11 @@ class AutoBackupGlobalSettingsService
             'default_keep_remote' => $defaultKeepRemote,
             'destinations' => [
                 'google_drive' => [
+                    'auth_mode' => $this->sanitizeGoogleAuthMode((string) $this->get(self::KEY_GOOGLE_AUTH_MODE, 'oauth')),
                     'client_id' => (string) $this->get(self::KEY_GOOGLE_CLIENT_ID, ''),
                     'client_secret' => $this->getSecret(self::KEY_GOOGLE_CLIENT_SECRET),
                     'refresh_token' => $this->getSecret(self::KEY_GOOGLE_REFRESH_TOKEN),
+                    'service_account_json' => $this->getSecret(self::KEY_GOOGLE_SERVICE_ACCOUNT_JSON),
                     'folder_id' => (string) $this->get(self::KEY_GOOGLE_FOLDER_ID, ''),
                 ],
                 's3' => [
@@ -115,6 +122,7 @@ class AutoBackupGlobalSettingsService
             'has_secrets' => [
                 self::KEY_GOOGLE_CLIENT_SECRET => $this->secretExists(self::KEY_GOOGLE_CLIENT_SECRET),
                 self::KEY_GOOGLE_REFRESH_TOKEN => $this->secretExists(self::KEY_GOOGLE_REFRESH_TOKEN),
+                self::KEY_GOOGLE_SERVICE_ACCOUNT_JSON => $this->secretExists(self::KEY_GOOGLE_SERVICE_ACCOUNT_JSON),
                 self::KEY_S3_SECRET_ACCESS_KEY => $this->secretExists(self::KEY_S3_SECRET_ACCESS_KEY),
                 self::KEY_DROPBOX_ACCESS_TOKEN => $this->secretExists(self::KEY_DROPBOX_ACCESS_TOKEN),
             ],
@@ -137,6 +145,7 @@ class AutoBackupGlobalSettingsService
         $this->set(self::KEY_DEFAULT_INTERVAL, (string) max(5, min(10080, (int) ($payload['auto_backups:default_interval_minutes'] ?? 360))));
         $this->set(self::KEY_DEFAULT_KEEP_REMOTE, (string) max(1, min(1000, (int) ($payload['auto_backups:default_keep_remote'] ?? 10))));
 
+        $this->set(self::KEY_GOOGLE_AUTH_MODE, $this->sanitizeGoogleAuthMode((string) ($payload['auto_backups:google_drive:auth_mode'] ?? 'oauth')));
         $this->set(self::KEY_GOOGLE_CLIENT_ID, trim((string) ($payload['auto_backups:google_drive:client_id'] ?? '')));
         $this->set(self::KEY_GOOGLE_FOLDER_ID, trim((string) ($payload['auto_backups:google_drive:folder_id'] ?? '')));
 
@@ -151,6 +160,7 @@ class AutoBackupGlobalSettingsService
 
         $this->setSecretFromPayload(self::KEY_GOOGLE_CLIENT_SECRET, $payload['auto_backups:google_drive:client_secret'] ?? null);
         $this->setSecretFromPayload(self::KEY_GOOGLE_REFRESH_TOKEN, $payload['auto_backups:google_drive:refresh_token'] ?? null);
+        $this->setSecretFromPayload(self::KEY_GOOGLE_SERVICE_ACCOUNT_JSON, $payload['auto_backups:google_drive:service_account_json'] ?? null);
         $this->setSecretFromPayload(self::KEY_S3_SECRET_ACCESS_KEY, $payload['auto_backups:s3:secret_access_key'] ?? null);
         $this->setSecretFromPayload(self::KEY_DROPBOX_ACCESS_TOKEN, $payload['auto_backups:dropbox:access_token'] ?? null);
     }
@@ -191,6 +201,13 @@ class AutoBackupGlobalSettingsService
         $value = strtolower(trim($value));
 
         return in_array($value, ['google_drive', 's3', 'dropbox'], true) ? $value : 'google_drive';
+    }
+
+    private function sanitizeGoogleAuthMode(string $value): string
+    {
+        $value = strtolower(trim($value));
+
+        return in_array($value, ['oauth', 'service_account'], true) ? $value : 'oauth';
     }
 
     private function setSecretFromPayload(string $key, mixed $value): void
@@ -238,4 +255,3 @@ class AutoBackupGlobalSettingsService
         return trim($this->getSecret($key)) !== '';
     }
 }
-

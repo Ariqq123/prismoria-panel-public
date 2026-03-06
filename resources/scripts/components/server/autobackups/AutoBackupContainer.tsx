@@ -5,7 +5,7 @@ import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import Spinner from '@/components/elements/Spinner';
 import Label from '@/components/elements/Label';
-import Input from '@/components/elements/Input';
+import Input, { Textarea } from '@/components/elements/Input';
 import Select from '@/components/elements/Select';
 import { Button } from '@/components/elements/button';
 import useFlash from '@/plugins/useFlash';
@@ -199,7 +199,9 @@ const defaultConfig = (type: AutoBackupDestinationType): Record<string, unknown>
     }
 
     return {
+        auth_mode: 'service_account',
         folder_id: '',
+        service_account_json: '',
         client_id: '',
         client_secret: '',
         refresh_token: '',
@@ -235,6 +237,17 @@ const boolFromConfig = (value: unknown): boolean => {
     }
 
     return Boolean(value);
+};
+
+const googleAuthModeFromConfig = (value: unknown): 'service_account' | 'oauth' => {
+    if (typeof value === 'string') {
+        const normalized = value.toLowerCase().trim();
+        if (normalized === 'oauth') {
+            return 'oauth';
+        }
+    }
+
+    return 'service_account';
 };
 
 const statusTone = (profile: AutoBackupProfile): { label: string; style: React.CSSProperties } => {
@@ -519,8 +532,8 @@ export default () => {
                             Google Drive
                         </div>
                         <p css={tw`mt-2 text-xs leading-relaxed text-neutral-300`}>
-                            Required: <code>client_id</code>, <code>client_secret</code>, <code>refresh_token</code>. Optional:
-                            <code> folder_id</code>.
+                            Simple mode (recommended): <code>service_account_json</code>. Advanced mode: <code>client_id</code>,
+                            <code> client_secret</code>, <code>refresh_token</code>. Optional: <code>folder_id</code>.
                         </p>
                     </div>
                 </MagicCard>
@@ -644,80 +657,150 @@ export default () => {
                     </div>
                     </div>
 
-                    {payload.destination_type === 'google_drive' && (
-                        <div css={tw`mt-5 grid grid-cols-1 md:grid-cols-2 gap-4`}>
-                            <div>
-                                <Label>Google OAuth Client ID</Label>
-                                <Input
-                                    value={String(destinationConfig.client_id || '')}
-                                    onChange={(event) => {
-                                        const value = event.currentTarget.value;
-                                        setPayload((current) => ({
-                                            ...current,
-                                            destination_config: {
-                                                ...destinationConfig,
-                                                client_id: value,
-                                            },
-                                        }));
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <Label>Google OAuth Client Secret</Label>
-                                <Input
-                                    type={'password'}
-                                    name={'google_client_secret'}
-                                    form={'autobackup-profile-form'}
-                                    value={String(destinationConfig.client_secret || '')}
-                                    onChange={(event) => {
-                                        const value = event.currentTarget.value;
-                                        setPayload((current) => ({
-                                            ...current,
-                                            destination_config: {
-                                                ...destinationConfig,
-                                                client_secret: value,
-                                            },
-                                        }));
-                                    }}
-                                />
-                            </div>
-                            <div css={tw`md:col-span-2`}>
-                                <Label>Google Refresh Token</Label>
-                                <Input
-                                    type={'password'}
-                                    name={'google_refresh_token'}
-                                    form={'autobackup-profile-form'}
-                                    value={String(destinationConfig.refresh_token || '')}
-                                    onChange={(event) => {
-                                        const value = event.currentTarget.value;
-                                        setPayload((current) => ({
-                                            ...current,
-                                            destination_config: {
-                                                ...destinationConfig,
-                                                refresh_token: value,
-                                            },
-                                        }));
-                                    }}
-                                />
-                            </div>
-                            <div css={tw`md:col-span-2`}>
-                                <Label>Google Drive Folder ID (Optional)</Label>
-                                <Input
-                                    value={String(destinationConfig.folder_id || '')}
-                                    onChange={(event) => {
-                                        const value = event.currentTarget.value;
-                                        setPayload((current) => ({
-                                            ...current,
-                                            destination_config: {
-                                                ...destinationConfig,
-                                                folder_id: value,
-                                            },
-                                        }));
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    )}
+                    {payload.destination_type === 'google_drive' &&
+                        (() => {
+                            const googleAuthMode = googleAuthModeFromConfig(destinationConfig.auth_mode);
+                            const hasServiceAccountJson = boolFromConfig(destinationConfig.has_service_account_json);
+                            const hasClientSecret = boolFromConfig(destinationConfig.has_client_secret);
+                            const hasRefreshToken = boolFromConfig(destinationConfig.has_refresh_token);
+
+                            return (
+                                <div css={tw`mt-5 grid grid-cols-1 md:grid-cols-2 gap-4`}>
+                                    <div css={tw`md:col-span-2`}>
+                                        <Label>Google Auth Mode</Label>
+                                        <Select
+                                            value={googleAuthMode}
+                                            onChange={(event) => {
+                                                const value = event.currentTarget.value === 'oauth' ? 'oauth' : 'service_account';
+                                                setPayload((current) => ({
+                                                    ...current,
+                                                    destination_config: {
+                                                        ...destinationConfig,
+                                                        auth_mode: value,
+                                                    },
+                                                }));
+                                            }}
+                                        >
+                                            <option value={'service_account'}>Service Account (Simple, Recommended)</option>
+                                            <option value={'oauth'}>OAuth Client + Refresh Token (Advanced)</option>
+                                        </Select>
+                                        <p css={tw`mt-2 text-xs text-neutral-400`}>
+                                            Service Account mode avoids refresh token management. Share the Drive folder with the service account email.
+                                        </p>
+                                    </div>
+                                    <div css={tw`md:col-span-2`}>
+                                        <Label>Google Drive Folder ID (Optional)</Label>
+                                        <Input
+                                            value={String(destinationConfig.folder_id || '')}
+                                            onChange={(event) => {
+                                                const value = event.currentTarget.value;
+                                                setPayload((current) => ({
+                                                    ...current,
+                                                    destination_config: {
+                                                        ...destinationConfig,
+                                                        folder_id: value,
+                                                    },
+                                                }));
+                                            }}
+                                        />
+                                    </div>
+
+                                    {googleAuthMode === 'service_account' && (
+                                        <div css={tw`md:col-span-2`}>
+                                            <Label>Service Account JSON</Label>
+                                            <Textarea
+                                                rows={7}
+                                                value={String(destinationConfig.service_account_json || '')}
+                                                onChange={(event) => {
+                                                    const value = event.currentTarget.value;
+                                                    setPayload((current) => ({
+                                                        ...current,
+                                                        destination_config: {
+                                                            ...destinationConfig,
+                                                            service_account_json: value,
+                                                        },
+                                                    }));
+                                                }}
+                                            />
+                                            <p css={tw`mt-2 text-xs text-neutral-400`}>
+                                                {hasServiceAccountJson
+                                                    ? 'A service account JSON is already saved. Leave blank to keep it, or paste a new one to replace it.'
+                                                    : 'Paste the full JSON key for your Google service account.'}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {googleAuthMode === 'oauth' && (
+                                        <>
+                                            <div>
+                                                <Label>Google OAuth Client ID</Label>
+                                                <Input
+                                                    value={String(destinationConfig.client_id || '')}
+                                                    onChange={(event) => {
+                                                        const value = event.currentTarget.value;
+                                                        setPayload((current) => ({
+                                                            ...current,
+                                                            destination_config: {
+                                                                ...destinationConfig,
+                                                                client_id: value,
+                                                            },
+                                                        }));
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>Google OAuth Client Secret</Label>
+                                                <Input
+                                                    type={'password'}
+                                                    name={'google_client_secret'}
+                                                    form={'autobackup-profile-form'}
+                                                    value={String(destinationConfig.client_secret || '')}
+                                                    onChange={(event) => {
+                                                        const value = event.currentTarget.value;
+                                                        setPayload((current) => ({
+                                                            ...current,
+                                                            destination_config: {
+                                                                ...destinationConfig,
+                                                                client_secret: value,
+                                                            },
+                                                        }));
+                                                    }}
+                                                />
+                                                {hasClientSecret && (
+                                                    <p css={tw`mt-2 text-xs text-neutral-400`}>
+                                                        Secret already saved. Leave blank to keep existing value.
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div css={tw`md:col-span-2`}>
+                                                <Label>Google Refresh Token</Label>
+                                                <Input
+                                                    type={'password'}
+                                                    name={'google_refresh_token'}
+                                                    form={'autobackup-profile-form'}
+                                                    value={String(destinationConfig.refresh_token || '')}
+                                                    onChange={(event) => {
+                                                        const value = event.currentTarget.value;
+                                                        setPayload((current) => ({
+                                                            ...current,
+                                                            destination_config: {
+                                                                ...destinationConfig,
+                                                                refresh_token: value,
+                                                            },
+                                                        }));
+                                                    }}
+                                                />
+                                                {hasRefreshToken && (
+                                                    <p css={tw`mt-2 text-xs text-neutral-400`}>
+                                                        Refresh token already saved. Leave blank to keep existing value.
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            );
+                        })()}
 
                     {payload.destination_type === 's3' && (
                         <div css={tw`mt-5 grid grid-cols-1 md:grid-cols-2 gap-4`}>
