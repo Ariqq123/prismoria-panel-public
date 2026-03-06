@@ -3,16 +3,21 @@
 }
 
 .panel {
-    @apply relative bg-gray-600 rounded max-w-xl w-full mx-auto shadow-lg text-left;
-    @apply ring-4 ring-gray-800 ring-opacity-80;
+    @apply relative rounded max-w-xl w-full mx-auto shadow-lg text-left;
+    background: var(--panel-modal-bg);
+    color: var(--panel-text);
+    border: 1px solid var(--panel-border);
+    box-shadow: 0 0 0 4px var(--panel-modal-ring);
 }
 
 .title {
-    @apply font-header text-xl font-medium mb-2 text-gray-50 pr-4;
+    @apply font-header text-xl font-medium mb-2 pr-4;
+    color: var(--panel-heading);
 }
 
 .close_icon {
     @apply w-5 h-5 group-hover:rotate-90 transition-transform duration-100;
+    color: var(--panel-text-muted);
 }
 
 .dialog_icon {

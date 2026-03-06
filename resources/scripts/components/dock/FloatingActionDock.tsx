@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots, faHome, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faHome, faMoon, faPlus, faSun } from '@fortawesome/free-solid-svg-icons';
 import tw from 'twin.macro';
 import styled from 'styled-components/macro';
+import { getPanelColorMode, PANEL_COLOR_MODE_UPDATED_EVENT, togglePanelColorMode } from '@/lib/colorMode';
 
 const MOBILE_DOCK_BREAKPOINT = 768;
 const IDLE_DIM_DELAY_MS = 1650;
@@ -16,11 +17,17 @@ const MAX_LIFT_PX = 12;
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 
 const DockShell = styled.div<{ $dimmed: boolean }>`
-    ${tw`fixed inset-x-0 mx-auto w-max z-[72] rounded-full border bg-neutral-900/75 px-3.5 py-2.5 shadow-2xl backdrop-blur-md`};
+    ${tw`fixed inset-x-0 mx-auto w-max z-[72] rounded-full border px-3.5 py-2.5 shadow-2xl backdrop-blur-md`};
     bottom: max(1rem, env(safe-area-inset-bottom));
-    border-color: ${({ $dimmed }) => ($dimmed ? 'rgba(82, 82, 91, 0.45)' : 'rgba(82, 82, 91, 0.82)')};
-    opacity: ${({ $dimmed }) => ($dimmed ? 0.36 : 1)};
-    transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1), border-color 280ms ease;
+    background: var(--panel-dock-bg);
+    border-color: ${({ $dimmed }) => ($dimmed ? 'var(--panel-dock-border-dim)' : 'var(--panel-dock-border)')};
+    opacity: ${({ $dimmed }) => ($dimmed ? 0.42 : 1)};
+    transform: translate3d(0, ${({ $dimmed }) => ($dimmed ? 'calc(100% - 0.9rem)' : '0')}, 0);
+    transition:
+        transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 320ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 280ms ease;
+    will-change: transform, opacity;
 
     &::before {
         content: '';
@@ -38,7 +45,13 @@ const DockShell = styled.div<{ $dimmed: boolean }>`
     @media (max-width: 768px) {
         bottom: max(0.75rem, env(safe-area-inset-bottom));
         padding: 0.4rem 0.55rem;
-        background: rgba(17, 24, 39, 0.66);
+        background: var(--panel-dock-bg-mobile);
+        transform: translate3d(0, ${({ $dimmed }) => ($dimmed ? 'calc(100% - 0.75rem)' : '0')}, 0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition-duration: 1ms;
+        transform: translate3d(0, 0, 0);
     }
 `;
 
@@ -51,7 +64,10 @@ const DockList = styled.div`
 `;
 
 const DockButton = styled.button`
-    ${tw`relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-neutral-500/60 bg-neutral-800/80 text-neutral-100`};
+    ${tw`relative inline-flex h-12 w-12 items-center justify-center rounded-full border`};
+    border-color: var(--panel-dock-button-border);
+    background: var(--panel-dock-button-bg);
+    color: var(--panel-dock-button-text);
     transform-origin: center bottom;
     transform: translateY(calc(-1px - var(--dock-lift, 0px))) scale(var(--dock-scale, 1));
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
@@ -80,8 +96,8 @@ const DockButton = styled.button`
 
     &:hover,
     &:focus-visible {
-        border-color: rgba(248, 113, 113, 0.86);
-        color: rgb(254 202 202);
+        border-color: var(--panel-accent-border);
+        color: var(--panel-accent-text);
         box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
         outline: none;
     }
@@ -112,6 +128,49 @@ const DockButton = styled.button`
     }
 `;
 
+const ThemeDockButton = styled(DockButton)<{ $activeMode: 'dark' | 'light' }>`
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 9999px;
+        background: radial-gradient(
+            circle at 30% 20%,
+            ${({ $activeMode }) => ($activeMode === 'light' ? 'rgba(250, 204, 21, 0.3)' : 'rgba(56, 189, 248, 0.24)')},
+            transparent 72%
+        );
+        pointer-events: none;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 9999px;
+        background: linear-gradient(
+            110deg,
+            rgba(248, 113, 113, 0) 10%,
+            rgba(248, 113, 113, 0.66) 48%,
+            rgba(248, 113, 113, 0) 88%
+        );
+        opacity: 0.65;
+        transform: translateX(-130%);
+        animation: dock-theme-shimmer 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+        pointer-events: none;
+    }
+
+    @keyframes dock-theme-shimmer {
+        0% {
+            transform: translateX(-130%);
+        }
+        100% {
+            transform: translateX(150%);
+        }
+    }
+`;
+
 const isFileEditorRoute = (pathname: string) => /^\/server\/[^/]+\/files\/(edit|new)(?:\/|$)/.test(pathname);
 
 export default () => {
@@ -130,6 +189,7 @@ export default () => {
     const [isDimmed, setDimmed] = useState(false);
     const [pointerX, setPointerX] = useState<number | null>(null);
     const [buttonCenters, setButtonCenters] = useState<number[]>([]);
+    const [colorMode, setColorMode] = useState<'dark' | 'light'>(() => getPanelColorMode());
 
     const clearIdleTimer = useCallback(() => {
         if (idleTimer.current !== null) {
@@ -212,6 +272,23 @@ export default () => {
             clearIdleTimer();
         };
     }, [clearIdleTimer, wakeDock]);
+
+    useEffect(() => {
+        const onColorModeUpdate = (event: Event) => {
+            const detail = (event as CustomEvent<{ mode?: 'dark' | 'light' }>).detail;
+            if (!detail?.mode) {
+                return;
+            }
+
+            setColorMode(detail.mode);
+        };
+
+        window.addEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, onColorModeUpdate);
+
+        return () => {
+            window.removeEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, onColorModeUpdate);
+        };
+    }, []);
 
     if (!isAuthenticated || location.pathname.startsWith('/auth')) {
         return null;
@@ -300,12 +377,28 @@ export default () => {
                 >
                     <FontAwesomeIcon icon={faCommentDots} />
                 </DockButton>
+                <ThemeDockButton
+                    ref={(node) => {
+                        buttonRefs.current[2] = node;
+                    }}
+                    style={computeButtonStyle(2)}
+                    type={'button'}
+                    aria-label={colorMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                    title={colorMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                    $activeMode={colorMode}
+                    onClick={() => {
+                        const nextMode = togglePanelColorMode();
+                        setColorMode(nextMode);
+                    }}
+                >
+                    <FontAwesomeIcon icon={colorMode === 'dark' ? faSun : faMoon} />
+                </ThemeDockButton>
                 {showExternalApiAction && (
                     <DockButton
                         ref={(node) => {
-                            buttonRefs.current[2] = node;
+                            buttonRefs.current[3] = node;
                         }}
-                        style={computeButtonStyle(2)}
+                        style={computeButtonStyle(3)}
                         type={'button'}
                         aria-label={'Add External API connection'}
                         onClick={() => window.dispatchEvent(new CustomEvent('external-api:open'))}

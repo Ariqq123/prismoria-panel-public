@@ -10,9 +10,12 @@ export default ({ meta }: { meta: Record<string, unknown> }) => {
         <div className={'self-center md:px-4'}>
             <Dialog open={open} onClose={() => setOpen(false)} hideCloseIcon title={'Metadata'}>
                 <pre
-                    className={
-                        'bg-gray-900 rounded p-2 font-mono text-sm leading-relaxed overflow-x-scroll whitespace-pre-wrap'
-                    }
+                    className={'rounded p-2 font-mono text-sm leading-relaxed overflow-x-scroll whitespace-pre-wrap'}
+                    style={{
+                        background: 'var(--panel-surface-3)',
+                        color: 'var(--panel-text)',
+                        border: '1px solid var(--panel-border)',
+                    }}
                 >
                     {JSON.stringify(meta, null, 2)}
                 </pre>
@@ -23,8 +26,9 @@ export default ({ meta }: { meta: Record<string, unknown> }) => {
             <button
                 aria-describedby={'View additional event metadata'}
                 className={
-                    'p-2 transition-colors duration-100 text-gray-400 group-hover:text-gray-300 group-hover:hover:text-gray-50'
+                    'p-2 transition-colors duration-100'
                 }
+                style={{ color: 'var(--panel-text-muted)' }}
                 onClick={() => setOpen(true)}
             >
                 <ClipboardListIcon className={'w-5 h-5'} />

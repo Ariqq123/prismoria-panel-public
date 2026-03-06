@@ -89,12 +89,14 @@ export default ({ children, ...props }: Props) => {
                         transition={{ type: 'spring', damping: 20, stiffness: 300, duration: 0.075 }}
                         {...getFloatingProps({
                             ref: floating,
-                            className:
-                                'bg-gray-900 text-sm text-gray-200 px-3 py-2 rounded pointer-events-none max-w-[24rem]',
+                            className: 'text-sm px-3 py-2 rounded pointer-events-none max-w-[24rem]',
                             style: {
                                 position: strategy,
                                 top: `${y || 0}px`,
                                 left: `${x || 0}px`,
+                                background: 'var(--panel-surface-1)',
+                                color: 'var(--panel-text)',
+                                border: '1px solid var(--panel-border)',
                             },
                         })}
                     >
@@ -106,8 +108,11 @@ export default ({ children, ...props }: Props) => {
                                     transform: `translate(${Math.round(ax || 0)}px, ${Math.round(
                                         ay || 0
                                     )}px) rotate(45deg)`,
+                                    background: 'var(--panel-surface-1)',
+                                    borderLeft: '1px solid var(--panel-border)',
+                                    borderTop: '1px solid var(--panel-border)',
                                 }}
-                                className={classNames('absolute bg-gray-900 w-3 h-3', side)}
+                                className={classNames('absolute w-3 h-3', side)}
                             />
                         )}
                     </motion.div>

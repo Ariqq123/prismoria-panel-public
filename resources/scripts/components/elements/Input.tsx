@@ -7,18 +7,24 @@ export interface Props {
 }
 
 const light = css<Props>`
-    ${tw`bg-white border-neutral-200 text-neutral-800`};
+    background-color: var(--panel-surface-2);
+    border-color: var(--panel-border);
+    color: var(--panel-input-text);
+
     &:focus {
-        ${tw`border-primary-400`}
+        border-color: var(--panel-border-strong);
     }
 
     &:disabled {
-        ${tw`bg-neutral-100 border-neutral-200`};
+        background-color: var(--panel-surface-3);
+        border-color: var(--panel-border);
     }
 `;
 
 const checkboxStyle = css<Props>`
-    ${tw`bg-neutral-500 cursor-pointer appearance-none inline-block align-middle select-none flex-shrink-0 w-4 h-4 text-primary-400 border border-neutral-300 rounded-sm`};
+    ${tw`cursor-pointer appearance-none inline-block align-middle select-none flex-shrink-0 w-4 h-4 text-primary-400 border rounded-sm`};
+    background-color: var(--panel-input-bg);
+    border-color: var(--panel-input-border);
     color-adjust: exact;
     background-origin: border-box;
     transition: all 75ms linear, box-shadow 25ms linear;
@@ -41,11 +47,18 @@ const inputStyle = css<Props>`
     resize: none;
     ${tw`appearance-none outline-none w-full min-w-0`};
     ${tw`p-3 border-2 rounded text-sm transition-all duration-150`};
-    ${tw`bg-neutral-600 border-neutral-500 hover:border-neutral-400 text-neutral-200 shadow-none focus:ring-0`};
+    ${tw`shadow-none focus:ring-0`};
+    background-color: var(--panel-input-bg);
+    border-color: var(--panel-input-border);
+    color: var(--panel-input-text);
+
+    &:hover:not(:disabled):not(:read-only) {
+        border-color: var(--panel-input-border-hover);
+    }
 
     & + .input-help {
         ${tw`mt-1 text-xs`};
-        ${(props) => (props.hasError ? tw`text-red-200` : tw`text-neutral-200`)};
+        color: ${(props) => (props.hasError ? 'rgb(254 202 202)' : 'var(--panel-text-muted)')};
     }
 
     &:required,
@@ -63,7 +76,16 @@ const inputStyle = css<Props>`
     }
 
     ${(props) => props.isLight && light};
-    ${(props) => props.hasError && tw`text-red-100 border-red-400 hover:border-red-300`};
+    ${(props) =>
+        props.hasError &&
+        css`
+            color: rgb(254 226 226);
+            border-color: rgb(248 113 113);
+
+            &:hover:not(:disabled):not(:read-only) {
+                border-color: rgb(252 165 165);
+            }
+        `};
 `;
 
 const Input = styled.input<Props>`

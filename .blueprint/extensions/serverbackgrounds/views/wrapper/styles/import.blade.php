@@ -1,9 +1,30 @@
 <head>
 @php
-    $defaultServerBackgroundMediaPath = '/var/www/pterodactyl/default-img/default-video.mp4';
-    $defaultServerBackgroundMediaUrl = file_exists($defaultServerBackgroundMediaPath)
-        ? '/default-img/default-video.mp4?v=' . filemtime($defaultServerBackgroundMediaPath)
+    $defaultServerBackgroundDarkMediaPath = '/var/www/pterodactyl/default-img/default-video.mp4';
+    $defaultServerBackgroundDarkMediaUrl = file_exists($defaultServerBackgroundDarkMediaPath)
+        ? '/default-img/default-video.mp4?v=' . filemtime($defaultServerBackgroundDarkMediaPath)
         : '';
+
+    $defaultServerBackgroundLightMediaUrl = '';
+    $lightDefaultBackgroundCandidates = [
+        '/var/www/pterodactyl/default-img/default-video-light.mp4' => '/default-img/default-video-light.mp4',
+        '/var/www/pterodactyl/default-img/default-light.mp4' => '/default-img/default-light.mp4',
+        '/var/www/pterodactyl/default-img/default-image-light.webp' => '/default-img/default-image-light.webp',
+        '/var/www/pterodactyl/default-img/default-light.webp' => '/default-img/default-light.webp',
+        '/var/www/pterodactyl/default-img/default-image-light.jpg' => '/default-img/default-image-light.jpg',
+        '/var/www/pterodactyl/default-img/default-light.jpg' => '/default-img/default-light.jpg',
+        '/var/www/pterodactyl/default-img/default-image-light.png' => '/default-img/default-image-light.png',
+        '/var/www/pterodactyl/default-img/default-light.png' => '/default-img/default-light.png',
+    ];
+
+    foreach ($lightDefaultBackgroundCandidates as $absolutePath => $publicPath) {
+        if (!file_exists($absolutePath)) {
+            continue;
+        }
+
+        $defaultServerBackgroundLightMediaUrl = $publicPath . '?v=' . filemtime($absolutePath);
+        break;
+    }
 @endphp
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,8 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const VIDEO_EXTENSIONS = ['.mp4', '.webm'];
     const IMAGE_PRELOAD_ROOT_MARGIN = '320px 0px';
     const MAX_EAGER_BACKGROUND_IMAGES = 4;
-    const DEFAULT_SERVER_BACKGROUND_MEDIA_URL = @json($defaultServerBackgroundMediaUrl);
-    const DEFAULT_SERVER_BACKGROUND_OPACITY = 0.72;
+    const DEFAULT_SERVER_BACKGROUND_DARK_MEDIA_URL = @json($defaultServerBackgroundDarkMediaUrl);
+    const DEFAULT_SERVER_BACKGROUND_LIGHT_MEDIA_URL = @json($defaultServerBackgroundLightMediaUrl);
+    const DEFAULT_SERVER_BACKGROUND_DARK_OPACITY = 0.72;
+    const DEFAULT_SERVER_BACKGROUND_LIGHT_OPACITY = 0.78;
+    const DEFAULT_SERVER_BACKGROUND_LIGHT_FALLBACK_OPACITY = 0.36;
+    const PANEL_COLOR_MODE_UPDATED_EVENT = 'panel:color-mode-updated';
     const preconnectedOrigins = new Set();
     let imageObserver = null;
 
@@ -50,6 +75,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const isDashboard = () => window.location.pathname === DASHBOARD_PATH;
+
+    const getCurrentColorMode = () =>
+        document.body?.dataset?.colorMode === 'light' ? 'light' : 'dark';
+
+    const resolveDefaultBackgroundForMode = () => {
+        const colorMode = getCurrentColorMode();
+
+        if (colorMode === 'light') {
+            if (DEFAULT_SERVER_BACKGROUND_LIGHT_MEDIA_URL) {
+                return {
+                    image_url: DEFAULT_SERVER_BACKGROUND_LIGHT_MEDIA_URL,
+                    opacity: DEFAULT_SERVER_BACKGROUND_LIGHT_OPACITY,
+                };
+            }
+
+            if (DEFAULT_SERVER_BACKGROUND_DARK_MEDIA_URL) {
+                return {
+                    image_url: DEFAULT_SERVER_BACKGROUND_DARK_MEDIA_URL,
+                    opacity: DEFAULT_SERVER_BACKGROUND_LIGHT_FALLBACK_OPACITY,
+                };
+            }
+
+            return null;
+        }
+
+        if (!DEFAULT_SERVER_BACKGROUND_DARK_MEDIA_URL) {
+            return null;
+        }
+
+        return {
+            image_url: DEFAULT_SERVER_BACKGROUND_DARK_MEDIA_URL,
+            opacity: DEFAULT_SERVER_BACKGROUND_DARK_OPACITY,
+        };
+    };
 
     // Cached API data so we don't refetch on every DOM mutation.
     let cacheKey = null;
@@ -335,14 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 serverBackgroundsByIdentifier.get(normalizeServerIdentifier(container.getAttribute('data-server-uuid')));
             const eggId = normalizeEggId(container.getAttribute('data-server-egg-id'));
             const eggBg = eggId ? eggBackgroundsById.get(eggId) : null;
-            const chosen = serverBg || eggBg || (
-                DEFAULT_SERVER_BACKGROUND_MEDIA_URL
-                    ? {
-                        image_url: DEFAULT_SERVER_BACKGROUND_MEDIA_URL,
-                        opacity: DEFAULT_SERVER_BACKGROUND_OPACITY,
-                    }
-                    : null
-            );
+            const chosen = serverBg || eggBg || resolveDefaultBackgroundForMode();
 
             const imageUrl = chosen?.image_url;
             const existing = container.querySelector(`.${BACKGROUND_MEDIA_CLASS}, .${BACKGROUND_CLASS}`);
@@ -370,6 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const opacity = clampOpacity(chosen?.opacity);
             const bgKey = `${imageUrl}|${opacity}`;
+            const isLightMode = getCurrentColorMode() === 'light';
+            const isLightFallbackFromDarkDefault =
+                isLightMode &&
+                !DEFAULT_SERVER_BACKGROUND_LIGHT_MEDIA_URL &&
+                DEFAULT_SERVER_BACKGROUND_DARK_MEDIA_URL &&
+                imageUrl === DEFAULT_SERVER_BACKGROUND_DARK_MEDIA_URL;
 
             let bgEl = existing;
             if (
@@ -424,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bgEl.style.bottom = '0';
             bgEl.style.zIndex = '0';
             bgEl.style.pointerEvents = 'none';
+            bgEl.style.filter = isLightFallbackFromDarkDefault ? 'brightness(1.38) saturate(0.82) contrast(0.9)' : 'none';
 
             if (isVideoMedia && bgEl instanceof HTMLVideoElement) {
                 attachVideoInteractionHandlers(container, bgEl);
@@ -548,6 +607,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.addEventListener('serverbackgrounds:navigation', onNavigation);
         window.addEventListener('popstate', emitNav);
+        window.addEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, () => {
+            if (!isDashboard()) return;
+            scheduleApplyBackgrounds();
+        });
         window.addEventListener('serverbackgrounds:invalidate', () => {
             resetCache();
             onNavigation();

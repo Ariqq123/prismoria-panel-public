@@ -17,17 +17,24 @@ const ContentBox = ({ title, headerAction, borderColor, showFlashes, showLoading
     <div {...props}>
         {title &&
             (!headerAction ? (
-                <h2 css={tw`text-neutral-300 mb-4 px-4 text-2xl`}>{title}</h2>
+                <h2 css={tw`mb-4 px-4 text-2xl`} style={{ color: 'var(--panel-heading)' }}>
+                    {title}
+                </h2>
             ) : (
                 <div css={tw`mb-4 px-4 flex items-center justify-between flex-wrap gap-2`}>
-                    <h2 css={tw`text-neutral-300 text-2xl`}>{title}</h2>
+                    <h2 css={tw`text-2xl`} style={{ color: 'var(--panel-heading)' }}>
+                        {title}
+                    </h2>
                     <div>{headerAction}</div>
                 </div>
             ))}
         {showFlashes && (
             <FlashMessageRender byKey={typeof showFlashes === 'string' ? showFlashes : undefined} css={tw`mb-4`} />
         )}
-        <div css={[tw`bg-neutral-700 p-4 rounded shadow-lg relative`, !!borderColor && tw`border-t-4`]}>
+        <div
+            css={[tw`p-4 rounded shadow-lg relative`, !!borderColor && tw`border-t-4`]}
+            style={{ backgroundColor: 'var(--panel-surface-2)', color: 'var(--panel-text)' }}
+        >
             <SpinnerOverlay visible={showLoadingOverlay || false} />
             {children}
         </div>

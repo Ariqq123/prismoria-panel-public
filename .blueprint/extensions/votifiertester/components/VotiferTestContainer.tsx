@@ -34,9 +34,10 @@ const MainLayout = styled.div`
 `;
 
 const MagicCard = styled.div<{ $interactive?: boolean }>`
-    ${tw`relative overflow-hidden rounded-xl border border-neutral-700 p-4 md:p-5`};
-    background: linear-gradient(140deg, rgba(17, 24, 39, 0.93) 0%, rgba(9, 13, 20, 0.96) 56%, rgba(16, 18, 24, 0.98) 100%);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+    ${tw`relative overflow-hidden rounded-xl border p-4 md:p-5`};
+    border-color: var(--panel-border);
+    background: var(--panel-magic-card-bg);
+    box-shadow: var(--panel-magic-card-shadow);
     transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease, box-shadow 220ms ease;
 
     &::before {
@@ -44,7 +45,7 @@ const MagicCard = styled.div<{ $interactive?: boolean }>`
         position: absolute;
         inset: -35% -12%;
         pointer-events: none;
-        background: radial-gradient(circle at top right, rgba(248, 113, 113, 0.16), transparent 58%);
+        background: var(--panel-magic-card-glow);
     }
 
     ${({ $interactive }) =>
@@ -52,8 +53,8 @@ const MagicCard = styled.div<{ $interactive?: boolean }>`
             ? `
         &:hover {
             transform: translateY(-2px);
-            border-color: rgba(248, 113, 113, 0.46);
-            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.38);
+            border-color: var(--panel-magic-accent-border);
+            box-shadow: var(--panel-magic-card-shadow-hover);
         }
     `
             : ''}
@@ -65,14 +66,7 @@ const ShineBorder = styled.div`
     border-radius: inherit;
     pointer-events: none;
     border: 1px solid transparent;
-    background: linear-gradient(
-            125deg,
-            rgba(248, 113, 113, 0.44),
-            rgba(251, 191, 36, 0.32),
-            rgba(96, 165, 250, 0.28),
-            rgba(248, 113, 113, 0.44)
-        )
-        border-box;
+    background: var(--panel-magic-border-gradient) border-box;
     background-size: 250% 250%;
     animation: ${borderFlow} 6s ease infinite;
     -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
@@ -82,7 +76,7 @@ const ShineBorder = styled.div`
 
 const HeroTitle = styled.h2`
     ${tw`text-lg md:text-xl font-semibold tracking-wide`};
-    background: linear-gradient(96deg, #fde68a, #fca5a5, #93c5fd, #fca5a5);
+    background: var(--panel-magic-title-gradient);
     background-size: 220% 220%;
     animation: ${auroraText} 7.2s ease infinite;
     -webkit-background-clip: text;
@@ -134,7 +128,7 @@ const VotifierTestContainer: React.FC = () => {
     };
 
     return (
-        <ServerContentBlock title={'Votifier Tester'} className={'content-dashboard'} css={tw`space-y-4`}>
+        <ServerContentBlock title={'Votifier Tester'}>
             <MainLayout>
                 <FlashMessageRender byKey={'server:votifier'} css={tw`mb-4`} />
 
@@ -143,7 +137,7 @@ const VotifierTestContainer: React.FC = () => {
                     <div css={tw`relative z-10`}>
                         <HeroTitle>Minecraft Vote Sender</HeroTitle>
                         <p css={tw`text-sm text-neutral-300 mt-1`}>
-                            Kirim vote test ke server langsung dari panel tanpa akses shell.
+                            Send a test vote to your server directly from the panel without shell access.
                         </p>
                     </div>
                 </MagicCard>
@@ -232,7 +226,10 @@ const VotifierTestContainer: React.FC = () => {
                                     />
                                 )}
 
-                                <div css={tw`rounded-md border border-neutral-700 bg-neutral-900/60 p-3`}>
+                                <div
+                                    css={tw`rounded-md border p-3`}
+                                    style={{ borderColor: 'var(--panel-chip-border)', background: 'var(--panel-chip-bg)' }}
+                                >
                                     <p css={tw`text-xs text-neutral-400 leading-relaxed`}>
                                         Public key: <code css={tw`text-neutral-200`}>plugins/Votifier/rsa/public.key</code>
                                         <br />

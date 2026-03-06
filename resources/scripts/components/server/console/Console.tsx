@@ -13,6 +13,7 @@ import useEventListener from '@/plugins/useEventListener';
 import { debounce } from 'debounce';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
+import { PANEL_COLOR_MODE_UPDATED_EVENT } from '@/lib/colorMode';
 import classNames from 'classnames';
 import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
 
@@ -21,26 +22,42 @@ import CommandRow from '@blueprint/components/Server/Terminal/CommandRow';
 import 'xterm/css/xterm.css';
 import styles from './style.module.css';
 
-const theme = {
-    background: th`colors.black`.toString(),
-    cursor: 'transparent',
-    black: th`colors.black`.toString(),
-    red: '#E54B4B',
-    green: '#9ECE58',
-    yellow: '#FAED70',
-    blue: '#396FE2',
-    magenta: '#BB80B3',
-    cyan: '#2DDAFD',
-    white: '#d0d0d0',
-    brightBlack: 'rgba(255, 255, 255, 0.2)',
-    brightRed: '#FF5370',
-    brightGreen: '#C3E88D',
-    brightYellow: '#FFCB6B',
-    brightBlue: '#82AAFF',
-    brightMagenta: '#C792EA',
-    brightCyan: '#89DDFF',
-    brightWhite: '#ffffff',
-    selection: '#FAF089',
+const getCssVariable = (name: string, fallback: string): string => {
+    if (typeof window === 'undefined') {
+        return fallback;
+    }
+
+    const value = window.getComputedStyle(document.body).getPropertyValue(name).trim();
+    return value || fallback;
+};
+
+const resolveTerminalTheme = (): ITerminalOptions['theme'] => {
+    const terminalBg = getCssVariable('--panel-terminal-bg', '#0f0f0f');
+    const terminalFg = getCssVariable('--panel-terminal-input-text', '#f3f4f6');
+
+    return {
+        background: terminalBg,
+        foreground: terminalFg,
+        cursor: terminalFg,
+        cursorAccent: terminalBg,
+        black: terminalBg,
+        red: '#E54B4B',
+        green: '#9ECE58',
+        yellow: '#FAED70',
+        blue: '#396FE2',
+        magenta: '#BB80B3',
+        cyan: '#2DDAFD',
+        white: '#d0d0d0',
+        brightBlack: 'rgba(255, 255, 255, 0.2)',
+        brightRed: '#FF5370',
+        brightGreen: '#C3E88D',
+        brightYellow: '#FFCB6B',
+        brightBlue: '#82AAFF',
+        brightMagenta: '#C792EA',
+        brightCyan: '#89DDFF',
+        brightWhite: terminalFg,
+        selection: 'rgba(250, 240, 137, 0.3)',
+    };
 };
 
 const terminalProps: ITerminalOptions = {
@@ -50,7 +67,7 @@ const terminalProps: ITerminalOptions = {
     fontSize: 12,
     fontFamily: th('fontFamily.mono'),
     rows: 30,
-    theme: theme,
+    theme: resolveTerminalTheme(),
 };
 
 const STRIP_TRAILING_NEWLINE = /(?:\r\n|\r|\n)$/im;
@@ -122,6 +139,10 @@ export default () => {
 
         writeQueue.current = [];
     }, []);
+
+    const applyTerminalTheme = useCallback(() => {
+        terminal.options.theme = resolveTerminalTheme();
+    }, [terminal]);
 
     const handleConsoleOutput = useCallback(
         (line: string, prelude = false) =>
@@ -221,6 +242,7 @@ export default () => {
             terminal.loadAddon(scrollDownHelperAddon);
 
             terminal.open(ref.current);
+            applyTerminalTheme();
             fitAddon.fit();
             searchBar.addNewStyle(zIndex);
 
@@ -239,7 +261,22 @@ export default () => {
                 return true;
             });
         }
-    }, [terminal, connected, fitAddon, searchAddon, searchBar, webLinksAddon, scrollDownHelperAddon]);
+    }, [terminal, connected, fitAddon, searchAddon, searchBar, webLinksAddon, scrollDownHelperAddon, applyTerminalTheme]);
+
+    useEffect(() => {
+        const handleColorModeUpdated = () => {
+            applyTerminalTheme();
+            if (terminal.element) {
+                terminal.refresh(0, terminal.rows - 1);
+            }
+        };
+
+        window.addEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, handleColorModeUpdated);
+
+        return () => {
+            window.removeEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, handleColorModeUpdated);
+        };
+    }, [terminal, applyTerminalTheme]);
 
     useEventListener(
         'resize',

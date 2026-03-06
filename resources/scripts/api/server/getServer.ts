@@ -56,6 +56,91 @@ export interface Server {
   externalServerIdentifier?: string;
 }
 
+type ServerResponseTuple = [Server, string[]];
+
+interface ServerResponseCacheEntry {
+  data: ServerResponseTuple;
+  expiresAt: number;
+  staleExpiresAt: number;
+}
+
+const SERVER_CACHE_TTL_MS = 20000;
+const SERVER_STALE_CACHE_TTL_MS = 5 * 60 * 1000;
+const SERVER_CACHE_MAX_ENTRIES = 120;
+const serverResponseCache = new Map<string, ServerResponseCacheEntry>();
+const inFlightServerRequests = new Map<string, Promise<ServerResponseTuple>>();
+
+const cloneServer = (server: Server): Server => ({
+  ...server,
+  sftpDetails: { ...server.sftpDetails },
+  limits: { ...server.limits },
+  eggFeatures: server.eggFeatures.slice(),
+  featureLimits: { ...server.featureLimits },
+  variables: server.variables.map((variable) => ({ ...variable })),
+  allocations: server.allocations.map((allocation) => ({ ...allocation })),
+  BlueprintFramework: { ...server.BlueprintFramework },
+});
+
+const cloneServerResponse = (response: ServerResponseTuple): ServerResponseTuple => [
+  cloneServer(response[0]),
+  response[1].slice(),
+];
+
+const enforceCacheLimit = (): void => {
+  if (serverResponseCache.size <= SERVER_CACHE_MAX_ENTRIES) {
+    return;
+  }
+
+  const overflow = serverResponseCache.size - SERVER_CACHE_MAX_ENTRIES;
+  const keys = serverResponseCache.keys();
+  for (let index = 0; index < overflow; index++) {
+    const oldestKey = keys.next().value;
+    if (!oldestKey) {
+      break;
+    }
+
+    serverResponseCache.delete(oldestKey);
+  }
+};
+
+const writeServerCache = (key: string, value: ServerResponseTuple): void => {
+  const now = Date.now();
+
+  serverResponseCache.delete(key);
+  serverResponseCache.set(key, {
+    data: value,
+    expiresAt: now + SERVER_CACHE_TTL_MS,
+    staleExpiresAt: now + SERVER_STALE_CACHE_TTL_MS,
+  });
+  enforceCacheLimit();
+};
+
+const readServerCache = (key: string, allowStale = false): ServerResponseTuple | null => {
+  const cached = serverResponseCache.get(key);
+  if (!cached) {
+    return null;
+  }
+
+  const now = Date.now();
+  if (cached.expiresAt > now || (allowStale && cached.staleExpiresAt > now)) {
+    return cloneServerResponse(cached.data);
+  }
+
+  return null;
+};
+
+export const clearServerCache = (serverId?: string): void => {
+  if (!serverId) {
+    serverResponseCache.clear();
+    inFlightServerRequests.clear();
+
+    return;
+  }
+
+  serverResponseCache.delete(serverId);
+  inFlightServerRequests.delete(serverId);
+};
+
 export const rawDataToServerObject = ({ attributes: data }: FractalResponseData): Server => ({
   // Some payloads (especially external) may omit BlueprintFramework.
   // Keep this object stable to avoid runtime crashes in route filtering.
@@ -104,17 +189,57 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     typeof data?.external_server_identifier === 'string' ? data.external_server_identifier : undefined,
 });
 
-export default (uuid: string): Promise<[Server, string[]]> => {
-  return new Promise((resolve, reject) => {
-    http
-      .get(`/api/client/servers/${uuid}`)
-      .then(({ data }) =>
-        resolve([
-          rawDataToServerObject(data),
-          // eslint-disable-next-line camelcase
-          data.meta?.is_server_owner ? ['*'] : data.meta?.user_permissions || [],
-        ]),
-      )
-      .catch(reject);
-  });
+const requestServer = (uuid: string): Promise<ServerResponseTuple> => {
+  const inFlight = inFlightServerRequests.get(uuid);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const request = http
+    .get(`/api/client/servers/${uuid}`)
+    .then(({ data }) => {
+      const response: ServerResponseTuple = [
+        rawDataToServerObject(data),
+        // eslint-disable-next-line camelcase
+        data.meta?.is_server_owner ? ['*'] : data.meta?.user_permissions || [],
+      ];
+
+      writeServerCache(uuid, response);
+
+      return response;
+    })
+    .catch((error) => {
+      const staleCached = readServerCache(uuid, true);
+      if (staleCached) {
+        return staleCached;
+      }
+
+      throw error;
+    })
+    .finally(() => {
+      inFlightServerRequests.delete(uuid);
+    });
+
+  inFlightServerRequests.set(uuid, request);
+
+  return request;
+};
+
+export const prefetchServer = (uuid: string): void => {
+  if (!uuid || readServerCache(uuid)) {
+    return;
+  }
+
+  void requestServer(uuid).catch(() => undefined);
+};
+
+export default async (uuid: string): Promise<ServerResponseTuple> => {
+  const cached = readServerCache(uuid);
+  if (cached) {
+    return cached;
+  }
+
+  const response = await requestServer(uuid);
+
+  return cloneServerResponse(response);
 };

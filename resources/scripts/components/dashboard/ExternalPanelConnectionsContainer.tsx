@@ -52,8 +52,8 @@ const defaultValues: Values = {
 
 const DockStyledContentBox = styled(ContentBox)`
     & > div:last-of-type {
-        background: rgba(10, 14, 25, 0.76);
-        border: 1px solid rgba(82, 82, 91, 0.72);
+        background: var(--panel-dock-bg);
+        border: 1px solid var(--panel-dock-border);
         border-radius: 1rem;
         backdrop-filter: blur(12px);
         box-shadow: 0 26px 50px rgba(0, 0, 0, 0.34);
@@ -65,7 +65,10 @@ const DockHeaderActions = styled.div`
 `;
 
 const DockHeaderButton = styled(HeaderButton)`
-    ${tw`rounded-full border border-neutral-500/70 bg-neutral-800/80 px-4 text-neutral-100 shadow-md`};
+    ${tw`rounded-full px-4 shadow-md`};
+    border: 1px solid var(--panel-dock-button-border);
+    background: var(--panel-dock-button-bg);
+    color: var(--panel-dock-button-text);
     backdrop-filter: blur(8px);
     transition: border-color 170ms ease, color 170ms ease, transform 170ms ease, box-shadow 170ms ease;
 
@@ -78,8 +81,9 @@ const DockHeaderButton = styled(HeaderButton)`
 `;
 
 const ConnectionCard = styled(GreyRowBox)<{ $connected: boolean }>`
-    ${tw`items-start sm:items-center rounded-2xl border bg-neutral-900/75 p-4 gap-3 transition-all duration-150`};
-    border-color: ${({ $connected }) => ($connected ? 'rgba(248, 113, 113, 0.7)' : 'rgba(82, 82, 91, 0.72)')};
+    ${tw`items-start sm:items-center rounded-2xl border p-4 gap-3 transition-all duration-150`};
+    background: var(--panel-surface-1);
+    border-color: ${({ $connected }) => ($connected ? 'rgba(248, 113, 113, 0.7)' : 'var(--panel-border)')};
     box-shadow: ${({ $connected }) =>
         $connected ? '0 14px 34px rgba(127, 29, 29, 0.24)' : '0 12px 28px rgba(0, 0, 0, 0.22)'};
     backdrop-filter: blur(10px);
@@ -91,9 +95,9 @@ const ConnectionCard = styled(GreyRowBox)<{ $connected: boolean }>`
 
 const ConnectionStatusPill = styled.p<{ $connected: boolean }>`
     ${tw`inline-flex items-center rounded-full border px-2.5 py-1 text-2xs uppercase tracking-wide`};
-    border-color: ${({ $connected }) => ($connected ? 'rgba(248, 113, 113, 0.65)' : 'rgba(113, 113, 122, 0.7)')};
-    color: ${({ $connected }) => ($connected ? 'rgb(254 202 202)' : 'rgb(203 213 225)')};
-    background: ${({ $connected }) => ($connected ? 'rgba(127, 29, 29, 0.28)' : 'rgba(39, 39, 42, 0.55)')};
+    border-color: ${({ $connected }) => ($connected ? 'rgba(248, 113, 113, 0.65)' : 'var(--panel-chip-border)')};
+    color: ${({ $connected }) => ($connected ? 'rgb(254 202 202)' : 'var(--panel-text-muted)')};
+    background: ${({ $connected }) => ($connected ? 'rgba(127, 29, 29, 0.28)' : 'var(--panel-chip-bg)')};
 `;
 
 const ConnectionActionGroup = styled.div`
@@ -101,16 +105,20 @@ const ConnectionActionGroup = styled.div`
 `;
 
 const DockModalSurface = styled.div`
-    ${tw`rounded-2xl border border-neutral-500/70 bg-neutral-900/75 p-4 sm:p-5 shadow-2xl`};
+    ${tw`rounded-2xl border p-4 sm:p-5 shadow-2xl`};
+    border-color: var(--panel-border);
+    background: var(--panel-surface-2);
     backdrop-filter: blur(12px);
 `;
 
 const DockModalTitle = styled.h2`
-    ${tw`text-2xl mb-1 text-neutral-100`};
+    ${tw`text-2xl mb-1`};
+    color: var(--panel-heading);
 `;
 
 const DockModalDescription = styled.p`
-    ${tw`text-sm text-neutral-300`};
+    ${tw`text-sm`};
+    color: var(--panel-text-muted);
 `;
 
 export default () => {
@@ -339,14 +347,28 @@ export default () => {
                 />
 
                 {importSummary && (
-                    <p css={tw`mb-4 rounded-xl border border-neutral-500/60 bg-neutral-800/70 px-3 py-2 text-xs text-neutral-200`}>
+                    <p
+                        css={tw`mb-4 rounded-xl border px-3 py-2 text-xs`}
+                        style={{
+                            borderColor: 'var(--panel-border)',
+                            background: 'var(--panel-surface-3)',
+                            color: 'var(--panel-text)',
+                        }}
+                    >
                         Imported {importSummary.imported}, updated {importSummary.updated}, skipped {importSummary.skipped} of{' '}
                         {importSummary.total} connection(s).
                     </p>
                 )}
 
                 {connections.length === 0 && !loading ? (
-                    <p css={tw`rounded-xl border border-neutral-500/60 bg-neutral-800/70 px-4 py-3 text-sm text-neutral-300`}>
+                    <p
+                        css={tw`rounded-xl border px-4 py-3 text-sm`}
+                        style={{
+                            borderColor: 'var(--panel-border)',
+                            background: 'var(--panel-surface-3)',
+                            color: 'var(--panel-text-muted)',
+                        }}
+                    >
                         No external panel connections configured.
                     </p>
                 ) : (
@@ -354,12 +376,16 @@ export default () => {
                         {connections.map((connection) => (
                             <ConnectionCard key={connection.id} $connected={connection.status === 'connected'}>
                                 <span
-                                    css={tw`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-neutral-500/70 bg-neutral-800/80 text-red-200 shadow-lg`}
+                                    css={tw`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border text-red-200 shadow-lg`}
+                                    style={{
+                                        borderColor: 'var(--panel-border)',
+                                        background: 'var(--panel-surface-3)',
+                                    }}
                                 >
                                     <FontAwesomeIcon icon={faPlug} />
                                 </span>
                                 <div css={tw`flex-1 overflow-hidden`}>
-                                    <p css={tw`text-sm text-neutral-100 break-words`}>
+                                    <p css={tw`text-sm break-words`} style={{ color: 'var(--panel-heading)' }}>
                                         {connection.name || 'External Panel'}
                                         {connection.defaultConnection && (
                                             <span
@@ -370,9 +396,11 @@ export default () => {
                                             </span>
                                         )}
                                     </p>
-                                    <p css={tw`text-xs text-neutral-300 break-words`}>{connection.panelUrl}</p>
+                                    <p css={tw`text-xs break-words`} style={{ color: 'var(--panel-text)' }}>
+                                        {connection.panelUrl}
+                                    </p>
                                     {connection.websocketOrigin && (
-                                        <p css={tw`text-xs text-neutral-400 break-words mt-1`}>
+                                        <p css={tw`text-xs break-words mt-1`} style={{ color: 'var(--panel-text-muted)' }}>
                                             WS Origin: {connection.websocketOrigin}
                                         </p>
                                     )}
@@ -380,7 +408,7 @@ export default () => {
                                         <ConnectionStatusPill $connected={connection.status === 'connected'}>
                                             {connection.status === 'connected' ? 'Connected' : 'Disconnected'}
                                         </ConnectionStatusPill>
-                                        <p css={tw`text-2xs text-neutral-400`}>
+                                        <p css={tw`text-2xs`} style={{ color: 'var(--panel-text-muted)' }}>
                                             {connection.lastVerifiedAt
                                                 ? `Verified ${format(connection.lastVerifiedAt, 'MMM do, yyyy HH:mm')}`
                                                 : 'Not verified yet'}
@@ -391,7 +419,8 @@ export default () => {
                                     <Button
                                         size={'xsmall'}
                                         isSecondary
-                                        className={'rounded-full border-neutral-500/70 bg-neutral-800/70'}
+                                        className={'rounded-full'}
+                                        style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
                                         onClick={() => onVerify(connection)}
                                     >
                                         Verify
@@ -399,7 +428,8 @@ export default () => {
                                     <Button
                                         size={'xsmall'}
                                         isSecondary
-                                        className={'rounded-full border-neutral-500/70 bg-neutral-800/70'}
+                                        className={'rounded-full'}
+                                        style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
                                         onClick={() => onEdit(connection)}
                                     >
                                         Edit
@@ -452,7 +482,11 @@ export default () => {
                             <FlashMessageRender byKey={'external-panels'} css={tw`mb-6`} />
                             <div css={tw`mb-6 flex items-start gap-3`}>
                                 <span
-                                    css={tw`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-neutral-500/70 bg-neutral-800/80 text-red-200 shadow-lg`}
+                                    css={tw`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border text-red-200 shadow-lg`}
+                                    style={{
+                                        borderColor: 'var(--panel-border)',
+                                        background: 'var(--panel-surface-3)',
+                                    }}
                                 >
                                     <FontAwesomeIcon icon={faPlug} />
                                 </span>
@@ -510,27 +544,34 @@ export default () => {
                                     description={'Use this connection by default when selecting external servers.'}
                                     className={'mb-4'}
                                 >
-                                    <div css={tw`flex items-center rounded-xl border border-neutral-500/60 bg-neutral-800/70 px-3 py-2`}>
+                                    <div
+                                        css={tw`flex items-center rounded-xl border px-3 py-2`}
+                                        style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+                                    >
                                         <Field
                                             as={Input}
                                             type={'checkbox'}
                                             name={'defaultConnection'}
                                             checked={values.defaultConnection}
                                         />
-                                        <span css={tw`ml-2 text-sm text-neutral-300`}>Set as default</span>
+                                        <span css={tw`ml-2 text-sm`} style={{ color: 'var(--panel-text-muted)' }}>
+                                            Set as default
+                                        </span>
                                     </div>
                                 </FormikFieldWrapper>
                                 <div css={tw`mt-6 flex flex-wrap justify-end gap-2`}>
                                     <Button
                                         type={'button'}
                                         isSecondary
-                                        css={tw`w-full sm:w-auto rounded-full border-neutral-500/70 bg-neutral-800/70`}
+                                        css={tw`w-full sm:w-auto rounded-full`}
+                                        style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
                                         onClick={closeModal}
                                     >
                                         Cancel
                                     </Button>
                                     <Button
-                                        css={tw`w-full sm:w-auto rounded-full border border-red-400/70 bg-neutral-800/80 text-red-100 shadow-lg`}
+                                        css={tw`w-full sm:w-auto rounded-full border border-red-400/70 text-red-100 shadow-lg`}
+                                        style={{ background: 'var(--panel-surface-3)' }}
                                         type={'submit'}
                                     >
                                         {editingConnection ? 'Save Connection' : 'Add Connection'}

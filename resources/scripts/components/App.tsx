@@ -16,12 +16,19 @@ import {
     getPanelBackgroundPreference,
     PANEL_BACKGROUND_PREFERENCE_UPDATED_EVENT,
 } from '@/lib/panelBackgroundPreference';
+import {
+    getPanelColorMode,
+    initializePanelColorMode,
+    listenPanelColorModeStorageSync,
+    PANEL_COLOR_MODE_UPDATED_EVENT,
+} from '@/lib/colorMode';
 import '@/assets/tailwind.css';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import LoadingPage from '@/components/elements/LoadingPage';
 
 const DashboardRouter = lazy(() => import(/* webpackChunkName: "dashboard" */ '@/routers/DashboardRouter'));
-const ServerRouter = lazy(() => import(/* webpackChunkName: "server" */ '@/routers/ServerRouter'));
+const loadServerRouter = () => import(/* webpackChunkName: "server" */ '@/routers/ServerRouter');
+const ServerRouter = lazy(loadServerRouter);
 const AuthenticationRouter = lazy(() => import(/* webpackChunkName: "auth" */ '@/routers/AuthenticationRouter'));
 const ExternalPanelQuickAddButton = lazy(
     () => import(/* webpackChunkName: "external-panel-quick-add" */ '@/components/dashboard/ExternalPanelQuickAddButton')
@@ -48,11 +55,35 @@ interface ExtendedWindow extends Window {
 setupInterceptors(history);
 
 const PANEL_BACKGROUND_OVERLAY_OPACITY = 0.35;
-const PANEL_BACKGROUND_FALLBACK_COLOR = 'rgb(15, 23, 42)';
 const PANEL_BACKGROUND_VIDEO_ID = 'panel-background-video';
 const PANEL_BACKGROUND_VIDEO_OVERLAY_ID = 'panel-background-video-overlay';
 const PANEL_BACKGROUND_VIDEO_EXTENSIONS = ['.mp4', '.webm'];
 const SERVER_ROUTE_PATTERN = /^\/server\/([^/]+)/;
+const PANEL_BACKGROUND_DARK_OVERLAY_RGB = '26, 26, 26';
+const PANEL_BACKGROUND_LIGHT_OVERLAY_RGB = '241, 245, 249';
+const PANEL_BACKGROUND_DARK_FALLBACK = 'rgb(23, 23, 23)';
+const PANEL_BACKGROUND_LIGHT_FALLBACK = 'rgb(241, 245, 249)';
+const PANEL_LIGHT_MODE_DEFAULT_BACKGROUND = '/default-img/defaul-background-white.jpg';
+
+const getPanelBackgroundTone = (): { overlayRgb: string; fallbackColor: string } => {
+    const mode = document.body.dataset.colorMode || getPanelColorMode();
+    if (mode === 'light') {
+        return {
+            overlayRgb: PANEL_BACKGROUND_LIGHT_OVERLAY_RGB,
+            fallbackColor: PANEL_BACKGROUND_LIGHT_FALLBACK,
+        };
+    }
+
+    return {
+        overlayRgb: PANEL_BACKGROUND_DARK_OVERLAY_RGB,
+        fallbackColor: PANEL_BACKGROUND_DARK_FALLBACK,
+    };
+};
+
+const resolvePanelDefaultBackgroundByMode = (): string => {
+    const mode = document.body.dataset.colorMode || getPanelColorMode();
+    return mode === 'light' ? PANEL_LIGHT_MODE_DEFAULT_BACKGROUND : '';
+};
 
 const hasVideoBackgroundExtension = (value: string): boolean => {
     const withoutHash = value.split('#')[0];
@@ -89,6 +120,7 @@ const removePanelBackgroundMediaLayers = () => {
 };
 
 const ensurePanelBackgroundVideoLayers = (videoUrl: string) => {
+    const tone = getPanelBackgroundTone();
     let video = document.getElementById(PANEL_BACKGROUND_VIDEO_ID) as HTMLVideoElement | null;
     if (!video) {
         video = document.createElement('video');
@@ -131,7 +163,7 @@ const ensurePanelBackgroundVideoLayers = (videoUrl: string) => {
         left: '0',
         right: '0',
         bottom: '0',
-        background: `rgba(15, 23, 42, ${PANEL_BACKGROUND_OVERLAY_OPACITY})`,
+        background: `rgba(${tone.overlayRgb}, ${PANEL_BACKGROUND_OVERLAY_OPACITY})`,
         pointerEvents: 'none',
         zIndex: '1',
     });
@@ -146,6 +178,7 @@ const ensurePanelBackgroundVideoLayers = (videoUrl: string) => {
 };
 
 const setPanelBackgroundImage = (image: string | undefined) => {
+    const tone = getPanelBackgroundTone();
     const value = typeof image === 'string' ? image.trim() : '';
     if (!value) {
         removePanelBackgroundMediaLayers();
@@ -159,7 +192,7 @@ const setPanelBackgroundImage = (image: string | undefined) => {
         return;
     }
 
-    document.body.style.backgroundColor = PANEL_BACKGROUND_FALLBACK_COLOR;
+    document.body.style.backgroundColor = tone.fallbackColor;
     document.body.style.backgroundAttachment = 'scroll';
 
     if (hasVideoBackgroundExtension(value)) {
@@ -175,8 +208,8 @@ const setPanelBackgroundImage = (image: string | undefined) => {
     removePanelBackgroundMediaLayers();
     const escaped = value.replace(/"/g, '\\"');
     document.body.style.backgroundImage = `linear-gradient(
-        rgba(15, 23, 42, ${PANEL_BACKGROUND_OVERLAY_OPACITY}),
-        rgba(15, 23, 42, ${PANEL_BACKGROUND_OVERLAY_OPACITY})
+        rgba(${tone.overlayRgb}, ${PANEL_BACKGROUND_OVERLAY_OPACITY}),
+        rgba(${tone.overlayRgb}, ${PANEL_BACKGROUND_OVERLAY_OPACITY})
     ), url("${escaped}")`;
     document.body.style.backgroundSize = 'cover';
     document.body.style.backgroundPosition = 'center center';
@@ -257,9 +290,11 @@ const App = () => {
     const applyPanelBackground = useCallback(() => {
         const activeServerIdentifier = resolveServerIdentifierFromPathname(history.location.pathname);
         const preference = getPanelBackgroundPreference(userUuid, activeServerIdentifier);
-        const userBackgroundImage = preference.enabled ? preference.imageUrl : '';
+        const userBackgroundImage = preference.enabled ? preference.imageUrl.trim() : '';
+        const siteBackgroundImage = typeof backgroundImage === 'string' ? backgroundImage.trim() : '';
+        const fallbackBackgroundImage = resolvePanelDefaultBackgroundByMode();
 
-        setPanelBackgroundImage(userBackgroundImage || backgroundImage);
+        setPanelBackgroundImage(userBackgroundImage || siteBackgroundImage || fallbackBackgroundImage);
     }, [backgroundImage, userUuid]);
 
     useEffect(() => {
@@ -268,14 +303,19 @@ const App = () => {
         const handlePreferenceChange = () => {
             applyPanelBackground();
         };
+        const handleColorModeChange = () => {
+            applyPanelBackground();
+        };
 
         window.addEventListener(PANEL_BACKGROUND_PREFERENCE_UPDATED_EVENT, handlePreferenceChange);
+        window.addEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, handleColorModeChange);
         const unlistenHistory = history.listen(() => {
             applyPanelBackground();
         });
 
         return () => {
             window.removeEventListener(PANEL_BACKGROUND_PREFERENCE_UPDATED_EVENT, handlePreferenceChange);
+            window.removeEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, handleColorModeChange);
             unlistenHistory();
         };
     }, [applyPanelBackground]);
@@ -290,6 +330,44 @@ const App = () => {
         return () => {
             document.removeEventListener('visibilitychange', onVisibilityChange);
         };
+    }, []);
+
+    useEffect(() => {
+        initializePanelColorMode();
+        const disposeStorageSync = listenPanelColorModeStorageSync();
+
+        return () => {
+            disposeStorageSync();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (window.location.pathname.startsWith('/auth')) {
+            return;
+        }
+
+        const preloadServerRouter = () => {
+            void loadServerRouter().catch(() => undefined);
+        };
+
+        const win = window as Window & {
+            requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+            cancelIdleCallback?: (handle: number) => void;
+        };
+
+        if (typeof win.requestIdleCallback === 'function') {
+            const idleHandle = win.requestIdleCallback(preloadServerRouter, { timeout: 1200 });
+
+            return () => {
+                if (typeof win.cancelIdleCallback === 'function') {
+                    win.cancelIdleCallback(idleHandle);
+                }
+            };
+        }
+
+        const timer = window.setTimeout(preloadServerRouter, 150);
+
+        return () => window.clearTimeout(timer);
     }, []);
 
     return (

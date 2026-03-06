@@ -602,11 +602,12 @@ export default ({ className }: WithClassname) => {
                         <div className={'w-full flex items-center justify-center pointer-events-none'}>
                             <div
                                 className={
-                                    'flex items-center space-x-4 bg-black w-full ring-4 ring-blue-200 ring-opacity-60 rounded p-6 mx-10 max-w-sm'
+                                    'flex items-center space-x-4 w-full ring-4 ring-blue-200 ring-opacity-60 rounded p-6 mx-10 max-w-sm'
                                 }
+                                style={{ background: 'var(--panel-surface-1)', border: '1px solid var(--panel-border)' }}
                             >
                                 <CloudUploadIcon className={'w-10 h-10 flex-shrink-0'} />
-                                <p className={'font-header flex-1 text-lg text-neutral-100 text-center'}>
+                                <p className={'font-header flex-1 text-lg text-center'} style={{ color: 'var(--panel-text)' }}>
                                     Drag and drop files to upload.
                                 </p>
                             </div>
@@ -616,7 +617,9 @@ export default ({ className }: WithClassname) => {
             </Portal>
             <Dialog open={folderWarning !== null} onClose={() => setFolderWarning(null)} title={'Folder Upload Warning'}>
                 <Dialog.Icon type={'warning'} />
-                <p className={'mt-3 mb-4 text-sm text-neutral-200'}>{folderWarning}</p>
+                <p className={'mt-3 mb-4 text-sm'} style={{ color: 'var(--panel-text)' }}>
+                    {folderWarning}
+                </p>
                 <Dialog.Footer>
                     <Button onClick={() => setFolderWarning(null)}>Okay</Button>
                 </Dialog.Footer>

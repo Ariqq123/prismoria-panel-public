@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import { Actions, useStoreActions } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
@@ -29,6 +29,34 @@ interface InsightsData {
         }>;
     };
 }
+
+const CARD_STYLE: CSSProperties = {
+    borderColor: 'var(--panel-border)',
+    background: 'var(--panel-surface-2)',
+};
+
+const SUBCARD_STYLE: CSSProperties = {
+    borderColor: 'var(--panel-border)',
+    background: 'var(--panel-surface-3)',
+};
+
+const NEUTRAL_BUTTON_STYLE: CSSProperties = {
+    borderColor: 'var(--panel-border)',
+    background: 'var(--panel-surface-3)',
+    color: 'var(--panel-text)',
+};
+
+const HEADING_STYLE: CSSProperties = {
+    color: 'var(--panel-heading)',
+};
+
+const TEXT_STYLE: CSSProperties = {
+    color: 'var(--panel-text)',
+};
+
+const MUTED_TEXT_STYLE: CSSProperties = {
+    color: 'var(--panel-text-muted)',
+};
 
 /**
  * Blueprint server route page for the MC Logs addon.
@@ -298,13 +326,15 @@ const LogsPage: React.FC = () => {
                 {currentPage > 1 && (
                     <>
                         <button
-                            css={tw`px-3 py-1 rounded border border-neutral-600 bg-neutral-700 text-neutral-100 hover:bg-neutral-600`}
+                            css={tw`px-3 py-1 rounded border transition-colors duration-150`}
+                            style={NEUTRAL_BUTTON_STYLE}
                             onClick={() => onPageChange(1)}
                         >
                             First
                         </button>
                         <button
-                            css={tw`px-3 py-1 rounded border border-neutral-600 bg-neutral-700 text-neutral-100 hover:bg-neutral-600`}
+                            css={tw`px-3 py-1 rounded border transition-colors duration-150`}
+                            style={NEUTRAL_BUTTON_STYLE}
                             onClick={() => onPageChange(currentPage - 1)}
                         >
                             Prev
@@ -315,9 +345,10 @@ const LogsPage: React.FC = () => {
                     <button
                         key={page}
                         css={[
-                            tw`px-3 py-1 rounded border border-neutral-600 bg-neutral-700 text-neutral-100 hover:bg-neutral-600`,
+                            tw`px-3 py-1 rounded border transition-colors duration-150`,
                             currentPage === page && tw`bg-primary-500 border-primary-600 text-primary-50`,
                         ]}
+                        style={currentPage === page ? undefined : NEUTRAL_BUTTON_STYLE}
                         onClick={() => onPageChange(page)}
                     >
                         {page}
@@ -326,13 +357,15 @@ const LogsPage: React.FC = () => {
                 {currentPage < totalPages && (
                     <>
                         <button
-                            css={tw`px-3 py-1 rounded border border-neutral-600 bg-neutral-700 text-neutral-100 hover:bg-neutral-600`}
+                            css={tw`px-3 py-1 rounded border transition-colors duration-150`}
+                            style={NEUTRAL_BUTTON_STYLE}
                             onClick={() => onPageChange(currentPage + 1)}
                         >
                             Next
                         </button>
                         <button
-                            css={tw`px-3 py-1 rounded border border-neutral-600 bg-neutral-700 text-neutral-100 hover:bg-neutral-600`}
+                            css={tw`px-3 py-1 rounded border transition-colors duration-150`}
+                            style={NEUTRAL_BUTTON_STYLE}
                             onClick={() => onPageChange(totalPages)}
                         >
                             Last
@@ -352,8 +385,11 @@ const LogsPage: React.FC = () => {
             <div css={tw`w-full max-w-6xl mx-auto space-y-4`}>
                 <FlashMessageRender byKey={'logs'} css={tw`mb-4`} />
                 {lastUploadedLog && (
-                    <div css={tw`rounded-lg border border-neutral-800 bg-neutral-900 shadow-md px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between`}>
-                        <p css={tw`text-sm text-neutral-200 break-all`}>
+                    <div
+                        css={tw`rounded-lg border shadow-md px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between`}
+                        style={CARD_STYLE}
+                    >
+                        <p css={tw`text-sm break-all`} style={TEXT_STYLE}>
                             Uploaded to mclo.gs:{' '}
                             <a
                                 href={lastUploadedLog.url}
@@ -365,18 +401,24 @@ const LogsPage: React.FC = () => {
                             </a>
                         </p>
                         <CopyOnClick text={lastUploadedLog.url}>
-                            <button css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}>
+                            <button
+                                css={tw`text-sm px-4 py-2 rounded border transition-colors duration-150`}
+                                style={NEUTRAL_BUTTON_STYLE}
+                            >
                                 Copy Link
                             </button>
                         </CopyOnClick>
                     </div>
                 )}
-                <div css={tw`rounded-lg border border-neutral-800 bg-neutral-900 shadow-md px-4 py-4 md:px-5`}>
+                <div css={tw`rounded-lg border shadow-md px-4 py-4 md:px-5`} style={CARD_STYLE}>
                     <div css={tw`flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-2`}>
-                        <h3 css={tw`text-lg text-neutral-100`}>Available Logs</h3>
+                        <h3 css={tw`text-lg`} style={HEADING_STYLE}>
+                            Available Logs
+                        </h3>
                         <div css={tw`flex flex-wrap items-center gap-2`}>
                             <select
-                                css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}
+                                css={tw`text-sm px-4 py-2 rounded border`}
+                                style={NEUTRAL_BUTTON_STYLE}
                                 value={logsPerPage}
                                 onChange={(e) => handleLogsPerPageChange(Number(e.target.value))}
                             >
@@ -386,7 +428,8 @@ const LogsPage: React.FC = () => {
                                 <option value={20}>20 per page</option>
                             </select>
                             <select
-                                css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}
+                                css={tw`text-sm px-4 py-2 rounded border`}
+                                style={NEUTRAL_BUTTON_STYLE}
                                 value={logSortOrder}
                                 onChange={(e) => setLogSortOrder(e.target.value as 'newest' | 'oldest')}
                             >
@@ -396,15 +439,17 @@ const LogsPage: React.FC = () => {
                         </div>
                     </div>
                     {!sortedLogs.length ? (
-                        <p css={tw`text-sm text-neutral-300`}>
+                        <p css={tw`text-sm`} style={MUTED_TEXT_STYLE}>
                             No logs found in the server directory. Are you running a Minecraft Server?
                         </p>
                     ) : (
                         <>
-                            <div css={tw`divide-y divide-neutral-700`}>
+                            <div css={tw`divide-y`} style={{ borderColor: 'var(--panel-border)' }}>
                                 {paginatedLogs.map((logFile) => (
                                     <div key={logFile} css={tw`flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between`}>
-                                        <span css={tw`text-sm text-neutral-200 break-all`}>{logFile}</span>
+                                        <span css={tw`text-sm break-all`} style={TEXT_STYLE}>
+                                            {logFile}
+                                        </span>
                                         <button
                                             css={tw`text-sm px-4 py-2 rounded border border-primary-600 bg-primary-500 text-primary-50 hover:bg-primary-600`}
                                             onClick={() => handleUploadToMclogs(logFile)}
@@ -421,24 +466,28 @@ const LogsPage: React.FC = () => {
 
                 <div>
                 <button
-                    css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}
+                    css={tw`text-sm px-4 py-2 rounded border transition-colors duration-150`}
+                    style={NEUTRAL_BUTTON_STYLE}
                     onClick={() => setHistoryVisible(!historyVisible)}
                 >
                     {historyVisible ? 'Hide MCLogs History' : 'Show MCLogs History'}
                 </button>
                 {historyVisible && (
-                    <div css={tw`rounded-lg border border-neutral-800 bg-neutral-900 shadow-md px-4 py-4 md:px-5 mt-4`}>
+                    <div css={tw`rounded-lg border shadow-md px-4 py-4 md:px-5 mt-4`} style={CARD_STYLE}>
                         <div css={tw`flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4`}>
-                            <h3 css={tw`text-lg text-neutral-100`}>MCLogs History</h3>
+                            <h3 css={tw`text-lg`} style={HEADING_STYLE}>
+                                MCLogs History
+                            </h3>
                             <div css={tw`flex flex-wrap items-center gap-2`}>
                                 <button
-                                    css={tw`text-sm bg-red-500 border border-red-600 text-white px-4 py-2 rounded hover:bg-red-600`}
+                                    css={tw`text-sm bg-red-500 border border-red-600 text-red-100 px-4 py-2 rounded hover:bg-red-600`}
                                     onClick={() => setShowModal(true)}
                                 >
                                     Delete All History
                                 </button>
                                 <select
-                                    css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}
+                                    css={tw`text-sm px-4 py-2 rounded border`}
+                                    style={NEUTRAL_BUTTON_STYLE}
                                     value={logsPerPage}
                                     onChange={(e) => handleLogsPerPageChange(Number(e.target.value))}
                                 >
@@ -448,7 +497,8 @@ const LogsPage: React.FC = () => {
                                     <option value={20}>20 per page</option>
                                 </select>
                                 <select
-                                    css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}
+                                    css={tw`text-sm px-4 py-2 rounded border`}
+                                    style={NEUTRAL_BUTTON_STYLE}
                                     value={sortOrder}
                                     onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
                                 >
@@ -458,12 +508,18 @@ const LogsPage: React.FC = () => {
                             </div>
                         </div>
                         {!mclogsUrls.length ? (
-                            <p css={tw`text-sm text-neutral-300`}>No MCLogs uploads found.</p>
+                            <p css={tw`text-sm`} style={MUTED_TEXT_STYLE}>
+                                No MCLogs uploads found.
+                            </p>
                         ) : (
                             <>
                                 <ul css={tw`list-none p-0`}>
                                     {paginatedHistory.map(({ id, url, uploadedAt }) => (
-                                        <li key={id} css={tw`py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-neutral-700 last:border-b-0`}>
+                                        <li
+                                            key={id}
+                                            css={tw`py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b last:border-b-0`}
+                                            style={{ borderColor: 'var(--panel-border)' }}
+                                        >
                                             <div css={tw`min-w-0`}>
                                                 <a
                                                     href={url}
@@ -473,14 +529,15 @@ const LogsPage: React.FC = () => {
                                                 >
                                                     {url}
                                                 </a>
-                                                <span css={tw`block text-sm text-neutral-400`}>
+                                                <span css={tw`block text-sm`} style={MUTED_TEXT_STYLE}>
                                                     Uploaded on: {new Date(uploadedAt).toLocaleString()}
                                                 </span>
                                             </div>
                                             <div css={tw`flex flex-wrap gap-2`}>
                                                 <CopyOnClick text={url}>
                                                     <button
-                                                        css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}
+                                                        css={tw`text-sm px-4 py-2 rounded border transition-colors duration-150`}
+                                                        style={NEUTRAL_BUTTON_STYLE}
                                                     >
                                                         <i className="fas fa-link"></i>
                                                     </button>
@@ -492,7 +549,7 @@ const LogsPage: React.FC = () => {
                                                     View Data
                                                 </button>
                                                 <button
-                                                    css={tw`text-sm bg-red-500 border border-red-600 text-white px-4 py-2 rounded hover:bg-red-600`}
+                                                    css={tw`text-sm bg-red-500 border border-red-600 text-red-100 px-4 py-2 rounded hover:bg-red-600`}
                                                     onClick={() => removeFromLocalStorage(id)}
                                                 >
                                                     <i className="fa-solid fa-trash"></i>
@@ -509,17 +566,20 @@ const LogsPage: React.FC = () => {
             </div>
 
             {showModal && (
-                <div css={tw`fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50`}>
-                    <div css={tw`rounded-lg border border-neutral-700 bg-neutral-900 p-6 text-center shadow-xl`}>
-                        <h3 css={tw`text-lg text-white mb-4`}>Are you sure you want to clear all history?</h3>
+                <div css={tw`fixed inset-0 flex items-center justify-center z-50`} style={{ background: 'var(--panel-overlay-bg)' }}>
+                    <div css={tw`rounded-lg border p-6 text-center shadow-xl`} style={CARD_STYLE}>
+                        <h3 css={tw`text-lg mb-4`} style={HEADING_STYLE}>
+                            Are you sure you want to clear all history?
+                        </h3>
                         <button
-                            css={tw`text-sm bg-red-500 border border-red-600 text-white px-4 py-2 rounded hover:bg-red-600 mr-4`}
+                            css={tw`text-sm bg-red-500 border border-red-600 text-red-100 px-4 py-2 rounded hover:bg-red-600 mr-4`}
                             onClick={clearAllLogs}
                         >
                             Yes, Delete All
                         </button>
                         <button
-                            css={tw`text-sm bg-neutral-800 border border-neutral-700 text-neutral-100 px-4 py-2 rounded hover:bg-neutral-700`}
+                            css={tw`text-sm px-4 py-2 rounded border transition-colors duration-150`}
+                            style={NEUTRAL_BUTTON_STYLE}
                             onClick={() => setShowModal(false)}
                         >
                             Cancel
@@ -529,7 +589,7 @@ const LogsPage: React.FC = () => {
             )}
 
             {insightsData && (
-                <div css={tw`rounded-lg border border-neutral-800 bg-neutral-900 shadow-md px-4 py-4 md:px-5`}>
+                <div css={tw`rounded-lg border shadow-md px-4 py-4 md:px-5`} style={CARD_STYLE}>
                     <div css={tw`flex items-center mb-4`}>
                         <img
                             src={getServerImageUrl(insightsData.name || 'Vanilla')}
@@ -537,41 +597,55 @@ const LogsPage: React.FC = () => {
                             css={tw`w-16 h-16 mr-4 rounded-full`}
                         />
                         <div>
-                            <h3 css={tw`text-lg text-neutral-100`}>{insightsData.name || 'Unknown Server'}</h3>
-                            <p css={tw`block text-sm text-neutral-400`}>Version: {insightsData.version || 'Not Available'}</p>
+                            <h3 css={tw`text-lg`} style={HEADING_STYLE}>
+                                {insightsData.name || 'Unknown Server'}
+                            </h3>
+                            <p css={tw`block text-sm`} style={MUTED_TEXT_STYLE}>
+                                Version: {insightsData.version || 'Not Available'}
+                            </p>
                         </div>
                     </div>
 
                     {insightsData.analysis?.problems?.length ? (
-                        <div css={tw`bg-neutral-800 border border-neutral-800 p-4 rounded`}>
-                            <h4 css={tw`text-base text-neutral-100 mb-2`}>Analysis</h4>
+                        <div css={tw`border p-4 rounded`} style={SUBCARD_STYLE}>
+                            <h4 css={tw`text-base mb-2`} style={HEADING_STYLE}>
+                                Analysis
+                            </h4>
                             {insightsData.analysis.problems.map((problem, index) => (
                                 <div key={index} css={tw`mb-4`}>
-                                    <p css={tw`text-sm text-neutral-300 mb-1`}>{problem.message || 'No problem message available.'}</p>
+                                    <p css={tw`text-sm mb-1`} style={TEXT_STYLE}>
+                                        {problem.message || 'No problem message available.'}
+                                    </p>
                                     {problem.solutions?.length ? (
-                                        <ul css={tw`list-disc list-inside text-sm text-neutral-400`}>
+                                        <ul css={tw`list-disc list-inside text-sm`} style={MUTED_TEXT_STYLE}>
                                             {problem.solutions.map((solution, idx) => (
                                                 <li key={idx}>{solution.message || 'No solution message available.'}</li>
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p css={tw`text-sm text-neutral-400`}>No solutions available.</p>
+                                        <p css={tw`text-sm`} style={MUTED_TEXT_STYLE}>
+                                            No solutions available.
+                                        </p>
                                     )}
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <p css={tw`text-sm text-neutral-300`}>No problems found in analysis.</p>
+                        <p css={tw`text-sm`} style={MUTED_TEXT_STYLE}>
+                            No problems found in analysis.
+                        </p>
                     )}
                 </div>
             )}
 
             {selectedLogData && (
-                <div css={tw`rounded-lg border border-neutral-800 bg-neutral-900 shadow-md px-4 py-4 md:px-5`}>
+                <div css={tw`rounded-lg border shadow-md px-4 py-4 md:px-5`} style={CARD_STYLE}>
                     <div css={tw`flex justify-between items-center mb-4`}>
-                        <h3 css={tw`text-lg text-neutral-100`}>Selected Log Data</h3>
+                        <h3 css={tw`text-lg`} style={HEADING_STYLE}>
+                            Selected Log Data
+                        </h3>
                         <button
-                            css={tw`text-sm bg-red-500 border border-red-600 text-white px-4 py-2 rounded hover:bg-red-600`}
+                            css={tw`text-sm bg-red-500 border border-red-600 text-red-100 px-4 py-2 rounded hover:bg-red-600`}
                             onClick={() => {
                                 setSelectedLogData(null);
                                 setInsightsData(null);
@@ -580,18 +654,21 @@ const LogsPage: React.FC = () => {
                             Close
                         </button>
                     </div>
-                    <h4 css={tw`text-base text-white mb-2`}>Raw Log</h4>
+                    <h4 css={tw`text-base mb-2`} style={HEADING_STYLE}>
+                        Raw Log
+                    </h4>
                     <button
-                        css={tw`mb-4 px-2 py-1 rounded border border-neutral-700 bg-neutral-800 text-neutral-200 text-xs hover:bg-neutral-700`}
+                        css={tw`mb-4 px-2 py-1 rounded border text-xs transition-colors duration-150`}
+                        style={NEUTRAL_BUTTON_STYLE}
                         onClick={() => setShowOriginal((v) => !v)}
                         type="button"
                     >
                         {showOriginal ? 'Show Grouped/Collapsible View' : 'Show Original Log Order'}
                     </button>
-                    <div css={tw`text-sm whitespace-pre-wrap mb-4 rounded border border-neutral-800 bg-neutral-800 p-3`}>
+                    <div css={tw`text-sm whitespace-pre-wrap mb-4 rounded border p-3`} style={SUBCARD_STYLE}>
                         {showOriginal ? (
                             selectedLogData.split('\n').map((line, index) => {
-                                let lineStyle = tw`text-white`;
+                                let lineStyle = { color: 'var(--panel-heading)' };
                                 if (line.includes('WARN')) lineStyle = tw`text-[#FF8C00]`;
                                 else if (line.includes('INFO')) lineStyle = tw`text-[#FFFF99]`;
                                 else if (line.includes('ERROR')) lineStyle = tw`text-[#F62451]`;
@@ -619,13 +696,14 @@ const LogsPage: React.FC = () => {
                                     ERROR: tw`text-[#F62451]`,
                                     WARN: tw`text-[#FF8C00]`,
                                     INFO: tw`text-[#FFFF99]`,
-                                    OTHER: tw`text-white`,
+                                    OTHER: { color: 'var(--panel-heading)' },
                                 };
                                 return LogSectionNames.map(type => (
                                     grouped[type].length > 0 && (
                                         <div key={type} css={tw`mb-2`}>
                                             <button
-                                                css={tw`mb-1 px-2 py-1 rounded border border-neutral-700 bg-neutral-800 text-neutral-200 text-xs hover:bg-neutral-700`}
+                                                css={tw`mb-1 px-2 py-1 rounded border text-xs transition-colors duration-150`}
+                                                style={NEUTRAL_BUTTON_STYLE}
                                                 onClick={() => setCollapsed(c => ({ ...c, [type]: !c[type] }))}
                                                 type="button"
                                             >

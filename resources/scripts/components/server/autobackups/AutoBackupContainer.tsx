@@ -57,16 +57,17 @@ const metricFloat = keyframes`
 `;
 
 const MagicCard = styled.div<{ $interactive?: boolean }>`
-    ${tw`relative overflow-hidden rounded-xl border border-neutral-700 p-4 md:p-5`};
-    background: linear-gradient(135deg, rgba(17, 24, 39, 0.94) 0%, rgba(10, 14, 21, 0.96) 58%, rgba(18, 18, 22, 0.98) 100%);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+    ${tw`relative overflow-hidden rounded-xl border p-4 md:p-5`};
+    border-color: var(--panel-border);
+    background: var(--panel-magic-card-bg);
+    box-shadow: var(--panel-magic-card-shadow);
     transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease, box-shadow 220ms ease;
 
     &::before {
         content: '';
         position: absolute;
         inset: -35% -15%;
-        background: radial-gradient(circle at top right, rgba(239, 68, 68, 0.18), transparent 55%);
+        background: var(--panel-magic-card-glow);
         pointer-events: none;
     }
 
@@ -78,7 +79,7 @@ const MagicCard = styled.div<{ $interactive?: boolean }>`
         width: 70%;
         height: 360%;
         pointer-events: none;
-        background: linear-gradient(120deg, rgba(248, 113, 113, 0), rgba(248, 113, 113, 0.16), rgba(147, 197, 253, 0));
+        background: var(--panel-magic-card-sweep);
         transform: rotate(14deg) translateX(-35%);
         transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms ease;
         opacity: 0;
@@ -89,8 +90,8 @@ const MagicCard = styled.div<{ $interactive?: boolean }>`
             ? `
         &:hover {
             transform: translateY(-2px);
-            border-color: rgba(248, 113, 113, 0.45);
-            box-shadow: 0 20px 42px rgba(0, 0, 0, 0.38);
+            border-color: var(--panel-magic-accent-border);
+            box-shadow: var(--panel-magic-card-shadow-hover);
         }
 
         &:hover::after {
@@ -107,8 +108,7 @@ const ShineBorder = styled.div`
     border-radius: inherit;
     pointer-events: none;
     border: 1px solid transparent;
-    background: linear-gradient(125deg, rgba(248, 113, 113, 0.42), rgba(250, 204, 21, 0.32), rgba(96, 165, 250, 0.32), rgba(248, 113, 113, 0.42))
-        border-box;
+    background: var(--panel-magic-border-gradient) border-box;
     background-size: 250% 250%;
     animation: ${shineTravel} 6s ease infinite;
     -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
@@ -118,7 +118,7 @@ const ShineBorder = styled.div`
 
 const AuroraHeading = styled.h2`
     ${tw`text-lg md:text-xl font-semibold tracking-wide`};
-    background: linear-gradient(95deg, #fde68a, #fca5a5, #93c5fd, #fca5a5);
+    background: var(--panel-magic-title-gradient);
     background-size: 220% 220%;
     animation: ${auroraFlow} 7s ease infinite;
     -webkit-background-clip: text;
@@ -127,7 +127,9 @@ const AuroraHeading = styled.h2`
 `;
 
 const MetricCard = styled.div<{ $delay?: number }>`
-    ${tw`rounded-lg border border-neutral-700 bg-black/25 px-3 py-2`};
+    ${tw`rounded-lg border px-3 py-2`};
+    border-color: var(--panel-chip-border);
+    background: var(--panel-chip-bg);
     animation: ${metricFloat} 6.2s ease-in-out infinite;
     animation-delay: ${({ $delay = 0 }) => `${$delay}s`};
 `;
@@ -147,7 +149,7 @@ const ActionDock = styled.div`
         content: '';
         position: absolute;
         inset: -2px;
-        background: linear-gradient(115deg, rgba(250, 204, 21, 0), rgba(250, 204, 21, 0.24), rgba(59, 130, 246, 0));
+        background: var(--panel-magic-action-sweep);
         transform: translateX(-125%);
         transition: transform 440ms cubic-bezier(0.22, 1, 0.36, 1);
         pointer-events: none;
@@ -156,8 +158,8 @@ const ActionDock = styled.div`
 
     & > button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-        border-color: rgba(248, 113, 113, 0.45);
+        box-shadow: var(--panel-magic-card-shadow);
+        border-color: var(--panel-magic-accent-border);
     }
 
     & > button:hover::before {
@@ -969,7 +971,12 @@ export default () => {
                     <div css={tw`mt-5`}>
                         <Label>Ignored Files (Optional)</Label>
                         <textarea
-                            css={tw`w-full mt-1 p-3 rounded bg-black/30 border border-neutral-700 text-neutral-100 text-sm`}
+                            css={tw`w-full mt-1 p-3 rounded border text-sm`}
+                            style={{
+                                background: 'var(--panel-chip-bg)',
+                                borderColor: 'var(--panel-chip-border)',
+                                color: 'var(--panel-text)',
+                            }}
                             rows={4}
                             value={payload.ignored_files || ''}
                             onChange={(event) => {
@@ -1066,7 +1073,14 @@ export default () => {
                                                 {status.label}
                                             </span>
                                             {profile.isLocked && (
-                                                <span css={tw`inline-flex items-center gap-1 rounded-full border border-neutral-600 bg-black/30 px-2 py-1 text-[11px] text-neutral-300`}>
+                                                <span
+                                                    css={tw`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px]`}
+                                                    style={{
+                                                        borderColor: 'var(--panel-chip-border)',
+                                                        background: 'var(--panel-chip-bg)',
+                                                        color: 'var(--panel-text-muted)',
+                                                    }}
+                                                >
                                                     <FontAwesomeIcon icon={faLock} />
                                                     Locked
                                                 </span>

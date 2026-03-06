@@ -102,7 +102,10 @@ export default ({ selected }: Props) => {
           <EmptyState>Select a player from any list to load advanced details and 3D skin preview.</EmptyState>
         ) : (
           <div css={tw`space-y-4`}>
-            <div css={tw`rounded-md border border-neutral-700 bg-neutral-800/70 p-3`}>
+            <div
+              css={tw`rounded-md border p-3`}
+              style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+            >
               <div css={tw`flex items-center gap-3 min-w-0`}>
                 <PlayerAvatar
                   name={selected.name}
@@ -129,9 +132,14 @@ export default ({ selected }: Props) => {
               )}
             </div>
 
-            <div css={tw`rounded-md border border-neutral-700 bg-neutral-800/70 p-3`}>
+            <div
+              css={tw`rounded-md border p-3`}
+              style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+            >
               <div css={tw`flex items-center justify-between gap-3 mb-3`}>
-                <p css={tw`text-sm font-semibold text-neutral-100`}>3D Skin Preview</p>
+                <p css={tw`text-sm font-semibold`} style={{ color: 'var(--panel-heading)' }}>
+                  3D Skin Preview
+                </p>
                 <Select
                   value={renderType}
                   onChange={(event) => setRenderType(event.currentTarget.value as StarlightRenderType)}
@@ -146,11 +154,14 @@ export default ({ selected }: Props) => {
                 </Select>
               </div>
 
-                            <div css={tw`rounded-md border border-neutral-700 bg-neutral-900 overflow-hidden mx-auto w-full max-w-sm`}>
+                            <div
+                                css={tw`rounded-md border overflow-hidden mx-auto w-full max-w-sm`}
+                                style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-2)' }}
+                            >
                                 <div css={tw`relative w-full`} style={{ paddingBottom: '100%' }}>
                                     <div css={tw`absolute inset-0 flex items-center justify-center`}>
                     {!starlightIdentifier ? (
-                      <p css={tw`text-xs text-neutral-500 px-4 text-center`}>
+                      <p css={tw`text-xs px-4 text-center`} style={{ color: 'var(--panel-text-muted)' }}>
                         No valid username or UUID available for this entry.
                       </p>
                     ) : renderUrl && !renderFailed ? (
@@ -174,8 +185,8 @@ export default ({ selected }: Props) => {
 
                     {isValidating && (
                       <div
-                        css={tw`absolute inset-0 bg-neutral-900 flex items-center justify-center`}
-                        style={{ opacity: 0.75 }}
+                        css={tw`absolute inset-0 flex items-center justify-center`}
+                        style={{ background: 'var(--panel-overlay-bg)', opacity: 0.75 }}
                       >
                         <Spinner size={'small'} />
                       </div>
@@ -183,31 +194,62 @@ export default ({ selected }: Props) => {
                   </div>
                 </div>
               </div>
-              <p css={tw`text-[11px] text-neutral-500 mt-2`}>
+              <p css={tw`text-[11px] mt-2`} style={{ color: 'var(--panel-text-muted)' }}>
                 Powered by LunarEclipse Starlight API. Render may fall back for unknown players.
               </p>
             </div>
 
             <div css={tw`grid grid-cols-2 gap-2`}>
-              <div css={tw`rounded-md border border-neutral-700 bg-neutral-800/60 px-3 py-2`}>
-                <p css={tw`text-[10px] uppercase tracking-wide text-neutral-400`}>OP</p>
-                <p css={tw`text-sm font-semibold text-neutral-100`}>{selected.isOp ? 'Yes' : 'No'}</p>
+              <div
+                css={tw`rounded-md border px-3 py-2`}
+                style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+              >
+                <p css={tw`text-[10px] uppercase tracking-wide`} style={{ color: 'var(--panel-text-muted)' }}>
+                  OP
+                </p>
+                <p css={tw`text-sm font-semibold`} style={{ color: 'var(--panel-heading)' }}>
+                  {selected.isOp ? 'Yes' : 'No'}
+                </p>
               </div>
-              <div css={tw`rounded-md border border-neutral-700 bg-neutral-800/60 px-3 py-2`}>
-                <p css={tw`text-[10px] uppercase tracking-wide text-neutral-400`}>Whitelisted</p>
-                <p css={tw`text-sm font-semibold text-neutral-100`}>{selected.isWhitelist ? 'Yes' : 'No'}</p>
+              <div
+                css={tw`rounded-md border px-3 py-2`}
+                style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+              >
+                <p css={tw`text-[10px] uppercase tracking-wide`} style={{ color: 'var(--panel-text-muted)' }}>
+                  Whitelisted
+                </p>
+                <p css={tw`text-sm font-semibold`} style={{ color: 'var(--panel-heading)' }}>
+                  {selected.isWhitelist ? 'Yes' : 'No'}
+                </p>
               </div>
-              <div css={tw`rounded-md border border-neutral-700 bg-neutral-800/60 px-3 py-2`}>
-                <p css={tw`text-[10px] uppercase tracking-wide text-neutral-400`}>Banned</p>
-                <p css={tw`text-sm font-semibold text-neutral-100`}>{selected.isBanned ? 'Yes' : 'No'}</p>
+              <div
+                css={tw`rounded-md border px-3 py-2`}
+                style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+              >
+                <p css={tw`text-[10px] uppercase tracking-wide`} style={{ color: 'var(--panel-text-muted)' }}>
+                  Banned
+                </p>
+                <p css={tw`text-sm font-semibold`} style={{ color: 'var(--panel-heading)' }}>
+                  {selected.isBanned ? 'Yes' : 'No'}
+                </p>
               </div>
-              <div css={tw`rounded-md border border-neutral-700 bg-neutral-800/60 px-3 py-2`}>
-                <p css={tw`text-[10px] uppercase tracking-wide text-neutral-400`}>IP Banned</p>
-                <p css={tw`text-sm font-semibold text-neutral-100`}>{selected.isIpBanned ? 'Yes' : 'No'}</p>
+              <div
+                css={tw`rounded-md border px-3 py-2`}
+                style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+              >
+                <p css={tw`text-[10px] uppercase tracking-wide`} style={{ color: 'var(--panel-text-muted)' }}>
+                  IP Banned
+                </p>
+                <p css={tw`text-sm font-semibold`} style={{ color: 'var(--panel-heading)' }}>
+                  {selected.isIpBanned ? 'Yes' : 'No'}
+                </p>
               </div>
             </div>
 
-            <div css={tw`rounded-md border border-neutral-700 bg-neutral-800/70 p-3 space-y-3`}>
+            <div
+              css={tw`rounded-md border p-3 space-y-3`}
+              style={{ borderColor: 'var(--panel-border)', background: 'var(--panel-surface-3)' }}
+            >
               <div>
                 <Code>{skinTypeLabel}</Code>
                 <Label>Skin Type</Label>
@@ -225,7 +267,8 @@ export default ({ selected }: Props) => {
                   href={data.skinUrl}
                   target={'_blank'}
                   rel={'noopener noreferrer'}
-                  css={tw`text-xs text-red-300 hover:text-red-200 transition-colors break-all`}
+                  css={tw`text-xs transition-colors break-all`}
+                  style={{ color: 'var(--panel-accent-text)' }}
                 >
                   Open Skin Texture
                 </a>

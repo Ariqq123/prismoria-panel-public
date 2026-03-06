@@ -96,13 +96,35 @@ export default () => {
             </ErrorBoundary>
             <BeforeEdit />
             {hash.replace(/^#/, '').endsWith('.pteroignore') && (
-                <div css={tw`mb-4 p-4 border-l-4 bg-neutral-900 rounded border-cyan-400`}>
-                    <p css={tw`text-neutral-300 text-sm`}>
-                        You&apos;re editing a <code css={tw`font-mono bg-black rounded py-px px-1`}>.pteroignore</code>{' '}
+                <div
+                    css={tw`mb-4 p-4 border-l-4 rounded border-cyan-400`}
+                    style={{ background: 'var(--panel-surface-1)' }}
+                >
+                    <p css={tw`text-sm`} style={{ color: 'var(--panel-text)' }}>
+                        You&apos;re editing a{' '}
+                        <code
+                            css={tw`font-mono rounded py-px px-1`}
+                            style={{ background: 'var(--panel-chip-bg)', border: '1px solid var(--panel-chip-border)' }}
+                        >
+                            .pteroignore
+                        </code>{' '}
                         file. Any files or directories listed in here will be excluded from backups. Wildcards are
-                        supported by using an asterisk (<code css={tw`font-mono bg-black rounded py-px px-1`}>*</code>).
+                        supported by using an asterisk (
+                        <code
+                            css={tw`font-mono rounded py-px px-1`}
+                            style={{ background: 'var(--panel-chip-bg)', border: '1px solid var(--panel-chip-border)' }}
+                        >
+                            *
+                        </code>
+                        ).
                         You can negate a prior rule by prepending an exclamation point (
-                        <code css={tw`font-mono bg-black rounded py-px px-1`}>!</code>).
+                        <code
+                            css={tw`font-mono rounded py-px px-1`}
+                            style={{ background: 'var(--panel-chip-bg)', border: '1px solid var(--panel-chip-border)' }}
+                        >
+                            !
+                        </code>
+                        ).
                     </p>
                 </div>
             )}

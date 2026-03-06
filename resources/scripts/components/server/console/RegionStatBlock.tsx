@@ -119,9 +119,21 @@ export default ({ title, copyOnClick, icon_name, color, children }: StatBlockPro
 
     return (
         <CopyOnClick text={copyOnClick}>
-            <div className={classNames(styles.stat_block, 'bg-gray-800')}>
-                <div className={classNames(styles.status_bar, color || 'bg-gray-700')} />
-                <div className={classNames(styles.icon, color || 'bg-gray-900')}>
+            <div
+                className={styles.stat_block}
+                style={{
+                    background: 'var(--panel-surface-2)',
+                    border: '1px solid var(--panel-border)',
+                }}
+            >
+                <div
+                    className={classNames(styles.status_bar, color)}
+                    style={!color ? { background: 'var(--panel-border-strong)' } : undefined}
+                />
+                <div
+                    className={classNames(styles.icon, color)}
+                    style={!color ? { background: 'var(--panel-surface-3)' } : undefined}
+                >
                     {countryCodeToSvg[icon_name] ? (
                         <img style={{ height: '2rem', width: '2rem', userSelect: 'none', WebkitUserSelect: 'none' }} src={countryCodeToSvg[icon_name]}/>
                     ) : (
@@ -129,11 +141,13 @@ export default ({ title, copyOnClick, icon_name, color, children }: StatBlockPro
                     )}
                 </div>
                 <div className={'flex flex-col justify-center overflow-hidden w-full'}>
-                    <p className={'font-header leading-tight text-xs md:text-sm text-gray-200'}>{title}</p>
+                    <p className={'font-header leading-tight text-xs md:text-sm'} style={{ color: 'var(--panel-text-muted)' }}>
+                        {title}
+                    </p>
                     <div
                         ref={ref}
-                        className={'h-[1.75rem] w-full font-semibold text-gray-50 truncate'}
-                        style={{ fontSize }}
+                        className={'h-[1.75rem] w-full font-semibold truncate'}
+                        style={{ fontSize, color: 'var(--panel-heading)' }}
                     >
                         {children}
                     </div>

@@ -257,9 +257,10 @@ const resetButtonShimmer = keyframes`
 `;
 
 const MagicResetButton = styled.button`
-    ${tw`relative inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-full px-4 text-xs font-semibold tracking-wide text-neutral-100`};
-    border: 1px solid rgba(82, 82, 91, 0.68);
-    background: rgba(38, 38, 38, 0.92);
+    ${tw`relative inline-flex h-10 items-center justify-center gap-2 overflow-hidden rounded-full px-4 text-xs font-semibold tracking-wide`};
+    border: 1px solid var(--panel-dock-button-border);
+    background: var(--panel-dock-button-bg);
+    color: var(--panel-dock-button-text);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
     backdrop-filter: blur(8px);
     transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms ease, color 180ms ease;

@@ -22,7 +22,7 @@ export interface ModalProps extends RequiredModalProps {
 
 export const ModalMask = styled.div`
     ${tw`fixed z-50 overflow-auto flex w-full inset-0`};
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--panel-overlay-bg);
 `;
 
 const ModalContainer = styled.div<{ alignTop?: boolean }>`
@@ -42,7 +42,8 @@ const ModalContainer = styled.div<{ alignTop?: boolean }>`
     margin-bottom: auto;
 
     & > .close-icon {
-        ${tw`absolute right-0 p-2 text-white cursor-pointer opacity-50 transition-all duration-150 ease-linear hover:opacity-100`};
+        ${tw`absolute right-0 p-2 cursor-pointer opacity-50 transition-all duration-150 ease-linear hover:opacity-100`};
+        color: var(--panel-modal-close);
         top: -2.5rem;
 
         &:hover {
@@ -123,14 +124,19 @@ const Modal: React.FC<ModalProps> = ({
                         <Fade timeout={150} appear in>
                             <div
                                 css={tw`absolute w-full h-full rounded flex items-center justify-center`}
-                                style={{ background: 'hsla(211, 10%, 53%, 0.35)', zIndex: 9999 }}
+                                style={{ background: 'var(--panel-modal-loading-overlay)', zIndex: 9999 }}
                             >
                                 <Spinner />
                             </div>
                         </Fade>
                     )}
                     <div
-                        css={tw`bg-neutral-800 p-3 sm:p-4 md:p-6 rounded shadow-md overflow-y-scroll transition-all duration-150`}
+                        css={tw`p-3 sm:p-4 md:p-6 rounded shadow-md overflow-y-scroll transition-all duration-150`}
+                        style={{
+                            backgroundColor: 'var(--panel-modal-bg)',
+                            color: 'var(--panel-text)',
+                            border: '1px solid var(--panel-border)',
+                        }}
                     >
                         {children}
                     </div>

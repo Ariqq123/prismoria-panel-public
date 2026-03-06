@@ -41,12 +41,15 @@ http.interceptors.response.use(
         return resp;
     },
     (error) => {
-        const config = error?.config as (Record<string, any> & { __retriedOnTimeout?: boolean }) | undefined;
+        const config = error?.config as
+            | (Record<string, any> & { __retriedOnTimeout?: boolean; __skipTimeoutRetry?: boolean })
+            | undefined;
         const isTimeout =
             error?.code === 'ECONNABORTED' || (typeof error?.message === 'string' && error.message.includes('timeout'));
         const isGetRequest = config?.method?.toLowerCase() === 'get';
+        const shouldRetryTimeout = !config?.__skipTimeoutRetry;
 
-        if (config && isTimeout && isGetRequest && !config.__retriedOnTimeout) {
+        if (config && isTimeout && isGetRequest && shouldRetryTimeout && !config.__retriedOnTimeout) {
             config.__retriedOnTimeout = true;
             config.timeout = Math.max(Number(config.timeout || 0), 60000);
 

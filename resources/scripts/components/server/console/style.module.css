@@ -31,7 +31,9 @@
     }
 
     & > .container {
-        @apply rounded-t p-1 sm:p-2 bg-black min-h-[16rem] flex-1 font-mono text-sm;
+        @apply rounded-t p-1 sm:p-2 min-h-[16rem] flex-1 font-mono text-sm;
+        background: var(--panel-terminal-bg);
+        color: var(--panel-terminal-input-text);
 
         & #terminal {
             @apply h-full;
@@ -41,7 +43,7 @@
             }
 
             &::-webkit-scrollbar-thumb {
-                @apply bg-slate-800;
+                background: var(--panel-border);
             }
         }
     }
@@ -51,7 +53,9 @@
     }
 
     & .command_input {
-        @apply relative bg-gray-900 px-2 text-gray-100 pl-10 pr-4 py-2 w-full font-mono text-sm sm:rounded-b;
+        @apply relative px-2 pl-10 pr-4 py-2 w-full font-mono text-sm sm:rounded-b;
+        background: var(--panel-terminal-input-bg);
+        color: var(--panel-terminal-input-text);
         @apply focus:ring-0 outline-none focus-visible:outline-none;
         @apply border-0 border-b-2 border-transparent transition-colors duration-100;
         @apply active:border-cyan-500 focus:border-cyan-500;
@@ -59,5 +63,7 @@
 }
 
 .chart_container {
-    @apply rounded shadow-lg pt-2 relative bg-gray-800;
+    @apply rounded shadow-lg pt-2 relative;
+    background: var(--panel-surface-1);
+    border: 1px solid var(--panel-border);
 }

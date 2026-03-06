@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faCogs, faLayerGroup, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faCogs, faLayerGroup, faMoon, faSignOutAlt, faSun } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import SearchContainer from '@/components/dashboard/search/SearchContainer';
@@ -12,6 +12,7 @@ import http from '@/api/http';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
 import Avatar from '@/components/Avatar';
+import { getPanelColorMode, PANEL_COLOR_MODE_UPDATED_EVENT, togglePanelColorMode } from '@/lib/colorMode';
 
 import BeforeNavigation from '@blueprint/components/Navigation/NavigationBar/BeforeNavigation';
 import AdditionalItems from '@blueprint/components/Navigation/NavigationBar/AdditionalItems';
@@ -21,11 +22,13 @@ const RightNavigation = styled.div`
     & > a,
     & > button,
     & > .navigation-link {
-        ${tw`flex items-center h-full no-underline text-neutral-300 px-6 cursor-pointer transition-all duration-150`};
+        ${tw`flex items-center h-full no-underline px-6 cursor-pointer transition-all duration-150`};
+        color: var(--panel-nav-text);
 
         &:active,
         &:hover {
-            ${tw`text-neutral-100 bg-black`};
+            background: var(--panel-nav-hover-bg);
+            color: var(--panel-nav-text-active);
         }
 
         &:active,
@@ -58,6 +61,7 @@ export default () => {
 
         return window.innerWidth <= 1150;
     });
+    const [colorMode, setColorMode] = useState<'dark' | 'light'>(() => getPanelColorMode());
     const isServerRoute = /^\/server(?:\/|$)/.test(location.pathname);
 
     const onTriggerLogout = () => {
@@ -131,8 +135,25 @@ export default () => {
         };
     }, [mobileViewportQuery]);
 
+    useEffect(() => {
+        const onColorModeUpdate = (event: Event) => {
+            const detail = (event as CustomEvent<{ mode?: 'dark' | 'light' }>).detail;
+            if (!detail?.mode) {
+                return;
+            }
+
+            setColorMode(detail.mode);
+        };
+
+        window.addEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, onColorModeUpdate);
+
+        return () => {
+            window.removeEventListener(PANEL_COLOR_MODE_UPDATED_EVENT, onColorModeUpdate);
+        };
+    }, []);
+
     return (
-        <div className={'w-full bg-neutral-900 shadow-md overflow-x-auto'} id={'NavigationBar'}>
+        <div className={'w-full shadow-md overflow-x-auto'} id={'NavigationBar'}>
             <BeforeNavigation />
             <SpinnerOverlay visible={isLoggingOut} />
             <div className={'mx-auto w-full flex items-center h-[3.5rem] max-w-[1200px] relative'}>
@@ -168,6 +189,22 @@ export default () => {
                 </div>
                 <RightNavigation className={'flex h-full items-center justify-center'}>
                     <SearchContainer />
+                    <Tooltip
+                        placement={'bottom'}
+                        content={colorMode === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    >
+                        <button
+                            type={'button'}
+                            id={'NavigationColorMode'}
+                            onClick={() => {
+                                const nextMode = togglePanelColorMode();
+                                setColorMode(nextMode);
+                            }}
+                            aria-label={colorMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                        >
+                            <FontAwesomeIcon icon={colorMode === 'dark' ? faSun : faMoon} />
+                        </button>
+                    </Tooltip>
                     <Tooltip placement={'bottom'} content={'Prismoria Network'}>
                         <NavLink to={'/'} exact id={'NavigationDashboard'}>
                             <FontAwesomeIcon icon={faLayerGroup} />

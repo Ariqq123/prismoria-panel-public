@@ -15,14 +15,28 @@
 }
 
 .file_row {
-    @apply flex items-center cursor-pointer bg-neutral-700 rounded-sm mb-px text-sm no-underline;
-    @apply hover:text-neutral-100 hover:bg-neutral-600;
+    @apply flex items-center cursor-pointer rounded-sm mb-px text-sm no-underline;
+    background: var(--panel-surface-3);
+    border: 1px solid var(--panel-border);
+    color: var(--panel-text);
+
+    &:hover {
+        background: var(--panel-surface-2);
+        color: var(--panel-heading);
+    }
 
     & > .details {
-        @apply flex flex-1 items-center text-neutral-300 no-underline px-4 py-2 overflow-hidden truncate;
+        @apply flex flex-1 items-center no-underline px-4 py-2 overflow-hidden truncate;
+        color: inherit;
 
         &:not(a) {
             @apply cursor-default;
         }
+    }
+
+    & > a.details.active {
+        background: var(--panel-chip-bg);
+        color: var(--panel-heading);
+        box-shadow: inset 3px 0 0 var(--panel-accent-border);
     }
 }

@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEthernet, faHdd, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import { Server } from '@/api/server/getServer';
+import { prefetchServer, Server } from '@/api/server/getServer';
 import getServerResourceUsage, { ServerPowerState, ServerStats } from '@/api/server/getServerResourceUsage';
 import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import tw from 'twin.macro';
@@ -307,6 +307,10 @@ const ServerRow = ({
     ]
         .filter(Boolean)
         .join(' ');
+    const prewarmServerNavigation = useCallback(() => {
+        prefetchServerRouterChunk();
+        prefetchServer(server.id);
+    }, [server.id]);
 
     if (isListMode) {
         return (
@@ -315,8 +319,10 @@ const ServerRow = ({
                 to={`/server/${server.id}`}
                 draggable={false}
                 className={rowClassName}
-                onMouseEnter={prefetchServerRouterChunk}
-                onFocus={prefetchServerRouterChunk}
+                onMouseEnter={prewarmServerNavigation}
+                onFocus={prewarmServerNavigation}
+                onMouseDown={prewarmServerNavigation}
+                onTouchStart={prewarmServerNavigation}
                 data-server-identifier={server.id}
                 data-server-uuid={server.uuid}
                 data-server-egg-id={server.BlueprintFramework?.eggId ?? ''}
@@ -394,8 +400,10 @@ const ServerRow = ({
             to={`/server/${server.id}`}
             draggable={false}
             className={rowClassName}
-            onMouseEnter={prefetchServerRouterChunk}
-            onFocus={prefetchServerRouterChunk}
+            onMouseEnter={prewarmServerNavigation}
+            onFocus={prewarmServerNavigation}
+            onMouseDown={prewarmServerNavigation}
+            onTouchStart={prewarmServerNavigation}
             data-server-identifier={server.id}
             data-server-uuid={server.uuid}
             data-server-egg-id={server.BlueprintFramework?.eggId ?? ''}
