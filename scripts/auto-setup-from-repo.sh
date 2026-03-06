@@ -331,7 +331,14 @@ configure_env() {
     upsert_env "QUEUE_CONNECTION" "redis" "${env_file}"
 
     if ! grep -qE '^APP_KEY=base64:' "${env_file}"; then
-        php "${PANEL_DIR}/artisan" key:generate --force
+        if [[ -f "${PANEL_DIR}/vendor/autoload.php" ]]; then
+            php "${PANEL_DIR}/artisan" key:generate --force
+        else
+            local generated_app_key
+            generated_app_key="base64:$(openssl rand -base64 32 | tr -d '\n')"
+            log "vendor/autoload.php missing; writing APP_KEY directly to .env."
+            upsert_env "APP_KEY" "${generated_app_key}" "${env_file}"
+        fi
     fi
 }
 
